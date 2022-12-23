@@ -1,0 +1,83 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EmployeeServiceApplication (dev)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <additionalParameters>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="spring.config.additional-location" />
+        <option name="value" value="server/dev/" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="one-c.host" />
+        <option name="value" value="${ONE_C_URL}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="one-c.username" />
+        <option name="value" value="${ONE_C_USERNAME}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="one-c.password" />
+        <option name="value" value="${ONE_C_PASSWORD}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="jira1.host" />
+        <option name="value" value="${RND_JIRA_URL}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="jira1.username" />
+        <option name="value" value="${LDAP_USERNAME}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="jira1.password" />
+        <option name="value" value="${LDAP_PASSWORD}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="jira2.host" />
+        <option name="value" value="${JIRA_2_URL}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="jira2.username" />
+        <option name="value" value="${JIRA_2_USERNAME}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="jira2.password" />
+        <option name="value" value="${JIRA_2_PASSWORD}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="auth-server.url" />
+        <option name="value" value="${AUTH_SERVER_URL}" />
+      </param>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="auth-server.realm" />
+        <option name="value" value="${AUTH_SERVER_REALM}" />
+      </param>
+    </additionalParameters>
+    <module name="employee-service.employee-service.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.octopusden.employee.EmployeeServiceApplication" />
+    <extension name="net.ashald.envfile">
+      <option name="IS_ENABLED" value="true" />
+      <option name="IS_SUBST" value="true" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="true" />
+      <option name="IS_IGNORE_MISSING_FILES" value="true" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        <ENTRY IS_ENABLED="true" PARSER="env" PATH="$USER_HOME$/dev.env" />
+      </ENTRIES>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

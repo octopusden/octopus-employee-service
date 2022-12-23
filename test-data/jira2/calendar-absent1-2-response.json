@@ -1,0 +1,32 @@
+{
+  "issues": [
+    {
+      "id": "324041",
+      "key": "CLDRRC-6521",
+      "fields": {
+        "customfield_16402": {
+          "name": "absent1",
+          "emailAddress": "absent1@domain.corp",
+          "displayName": "Absent Employee First",
+          "active": true
+        },
+        "customfield_10800": "2021-12-13",
+        "customfield_10801": "2021-12-17"
+      }
+    },
+    {
+      "id": "323964",
+      "key": "CLDRRC-6516",
+      "fields": {
+        "customfield_16402": {
+          "name": "absent2",
+          "emailAddress": "absent2@domain.corp",
+          "displayName": "Absent Employee Second",
+          "active": true
+        },
+        "customfield_10800": "2021-12-10",
+        "customfield_10801": "2021-12-15"
+      }
+    }
+  ]
+}

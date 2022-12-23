@@ -1,0 +1,12 @@
+[
+  {
+    "instanceId": 1,
+    "instanceName": "Customer1",
+    "isEnabled": true
+  },
+  {
+    "instanceId": 2,
+    "instanceName": "Customer2",
+    "isEnabled": false
+  }
+]

@@ -1,0 +1,42 @@
+employee-service:
+  work-day-hours: 8
+  user-availability:
+    jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
+
+one-c:
+  host: http://mockserver:1080/one-c
+  username: oneCUser
+  password: oneCPassword
+jira1:
+  host: http://mockserver:1080/jira1
+  username: jiraUser
+  password: jiraPassword
+
+jira2:
+  host: http://mockserver:1080/jira2
+  username: jira2User
+  password: jira2Password
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${auth-server.url}/realms/${auth-server.realm}
+  cloud:
+    discovery:
+      enabled: false
+
+auth-server:
+  url: # set via env
+  realm:
+
+logging.level:
+  org.springframework.security: DEBUG
+  org.springframework.web.reactive.function.client: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info

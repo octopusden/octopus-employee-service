@@ -1,0 +1,6 @@
+{
+  "name": "employee",
+  "emailAddress": "employee@example.local",
+  "displayName": "Employee",
+  "active": true
+}

@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  employee-service:
+    image: ${DOCKER_REGISTRY}/employee-service-staging:${APP_VERSION:-1.0-SNAPSHOT}
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - AUTH_SERVER_URL=${AUTH_SERVER_URL}
+      - AUTH_SERVER_REALM=${AUTH_SERVER_REALM}
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=/
+    volumes:
+      - ./employee-service.yaml:/application.yaml
+
+  mockserver:
+    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.11.1
+    ports:
+      - "1080:1080"

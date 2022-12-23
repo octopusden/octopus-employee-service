@@ -1,0 +1,42 @@
+employee-service:
+  user-availability:
+    jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
+
+service-registry:
+  username: user
+  password: password
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: #example http://user:password@localhost:8761/eureka/
+
+one-c:
+  host: # set via EnvFile
+  username:
+  password:
+
+jira1:
+  host: # set via EnvFile
+  username:
+  password:
+
+jira2:
+  host: # set via EnvFile
+  username:
+  password:
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${auth-server.url}/realms/${auth-server.realm}
+
+auth-server:
+  url: # set via EnvFile
+  realm:
+
+logging.level:
+  org.springframework.security: DEBUG
+  org.springframework.web.reactive.function.client: TRACE

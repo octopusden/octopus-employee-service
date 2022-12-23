@@ -1,0 +1,6 @@
+{
+  "name": "inactive",
+  "emailAddress": "inactive@example.local",
+  "displayName": "Inactive",
+  "active": false
+}

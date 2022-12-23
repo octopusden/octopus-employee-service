@@ -1,0 +1,18 @@
+{
+  "issues": [
+    {
+      "id": "324041",
+      "key": "CLDRRC-6521",
+      "fields": {
+        "customfield_16402": {
+          "name": "unavailable",
+          "emailAddress": "unavailable@domain.corp",
+          "displayName": "Not Available Employee",
+          "active": true
+        },
+        "customfield_10800": "2021-12-13",
+        "customfield_10801": "2021-12-17"
+      }
+    }
+  ]
+}
