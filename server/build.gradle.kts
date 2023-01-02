@@ -45,7 +45,6 @@ springBoot {
 
 docker {
     springBootApplication {
-        //baseImage.set("${rootProject.properties["docker.registry"]}/openjdk:11")
         baseImage.set("${rootProject.properties["docker.registry"]}/openjdk:11")
         ports.set(listOf(8080, 8080))
         images.set(setOf("${rootProject.properties["docker.registry"]}/${project.name}-staging:${project.version}"))
