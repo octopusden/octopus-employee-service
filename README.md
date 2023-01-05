@@ -7,7 +7,7 @@
 ./gradlew build dockerBuildImage -Pdocker.registry={DOCKER REGISTRY}
 ```
 
-{DOCKER REGISTRY} - the host of a docker registry(example: docker.io)
+{DOCKER REGISTRY} - the host of a docker registry where the image will be pulled(example: ghcr.io/octopusden)
 
 ### Environment variables
 

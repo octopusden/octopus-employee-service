@@ -44,12 +44,12 @@ jobs:
       run: |
         echo "Current version: ${{ steps.version.outputs.group1 }}"
     - name: Build with Gradle
-      run: ./gradlew build dockerBuildImage -Pdocker.registry=docker.io --info
+      run: ./gradlew build dockerBuildImage -Pdocker.registry=ghcr.io/octopusden --info
       env:
         BUILD_VERSION: ${{ steps.version.outputs.group1 }}
     - name: Publish
       if: ${{ !endsWith(steps.version.outputs.group1, 'SNAPSHOT') }}
-      run: ./gradlew -Pnexus=true publishToSonatype closeAndReleaseSonatypeStagingRepository
+      run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
