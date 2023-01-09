@@ -45,9 +45,9 @@ springBoot {
 
 docker {
     springBootApplication {
-        baseImage.set("docker.io/openjdk:11")
+        baseImage.set("${rootProject.properties["docker.registry"]}/openjdk:11")
         ports.set(listOf(8080, 8080))
-        images.set(setOf("${project.name}-staging:${project.version}"))
+        images.set(setOf("${rootProject.properties["publishing.docker.registry"]}/${project.name}-staging:${project.version}"))
     }
 }
 
@@ -58,6 +58,10 @@ dockerCompose {
     (System.getenv().get("DOCKER_REGISTRY") ?: project.properties["docker.registry"])
         ?.let {
             environment["DOCKER_REGISTRY"] = it
+        }
+    (System.getenv().get("PUBLISHING_DOCKER_REGISTRY") ?: project.properties["publishing.docker.registry"])
+        ?.let {
+            environment["PUBLISHING_DOCKER_REGISTRY"] = it
         }
     captureContainersOutputToFiles = File("$buildDir${File.separator}/docker_logs")
 }
