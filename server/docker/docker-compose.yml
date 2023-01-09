@@ -2,6 +2,6 @@ version: '3'
 
 services:
   mockserver:
-    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.11.1
+    image: docker.io/mockserver/mockserver:mockserver-5.11.1
     ports:
       - "1080:1080"
