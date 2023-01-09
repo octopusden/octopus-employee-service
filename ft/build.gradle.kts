@@ -9,6 +9,8 @@ dockerCompose {
     environment["APP_VERSION"] = project.version
     project.properties["docker.registry"]
         ?.let { environment["DOCKER_REGISTRY"] = it }
+    project.properties["publishing.docker.registry"]
+        ?.let { environment["PUBLISHING_DOCKER_REGISTRY"] = it }
     project.properties["auth-server.url"]
         ?.let { environment["AUTH_SERVER_URL"] }
     captureContainersOutputToFiles = File("$buildDir${File.separator}docker_logs")

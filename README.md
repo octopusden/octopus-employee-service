@@ -4,10 +4,11 @@
 
 ```shell
 
-./gradlew build dockerBuildImage -Pdocker.registry={DOCKER REGISTRY}
+./gradlew build dockerBuildImage -Pdocker.registry={DOCKER_REGISTRY} -Ppublishing.docker.registry={PUBLISHING_DOCKER_REGISTRY}
 ```
 
-{DOCKER REGISTRY} - the host of a docker registry(example: docker.io)
+{DOCKER_REGISTRY} - the host of a docker registry where base images will be pulled(example: docker.io)
+{PUBLISHING_DOCKER_REGISTRY} - the host and the namespace of a docker registry where the current image will be pushed(example: ghcr.io/octopusden)
 
 ### Environment variables
 
