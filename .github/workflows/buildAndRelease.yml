@@ -1,7 +1,7 @@
 name: BUILD AND RELEASE
 
 on:
-  repository_dispatch:
+  workflow_dispatch:
     inputs:
       COMMIT:
         description: 'ID of commit'
