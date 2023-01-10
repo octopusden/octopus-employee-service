@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v3
       name: Checkout(switching to commit)
       with:
-        ref: ${{ github.event.inputs.COMMIT }}
+        ref: ${{ inputs.COMMIT }}
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
@@ -32,19 +32,19 @@ jobs:
       id: version
       name: Prepare a version from a tag
       with:
-        text: ${{ github.event.input.BUILD_VERSION }}
+        text: ${{ inputs.BUILD_VERSION }}
         regex: '^v([0-9]+\.[0-9]+\.[0-9]+)$'
         flags: gm
     - name: Check version format
       if: ${{ steps.version.outputs.group1 == '' }}
       run: |
-        echo "Version must to match format 'v([0-9]+\.[0-9]+\.[0-9]+)$' but has value ${{ github.event.input.BUILD_VERSION }}"
+        echo "Version must to match format 'v([0-9]+\.[0-9]+\.[0-9]+)$' but has value ${{ inputs.BUILD_VERSION }}"
         exit 1
     - name: GitHub Tag Name
       run: |
         echo "Current version: ${{ steps.version.outputs.group1 }}"
     - name: Build with Gradle
-      run: ./gradlew build dockerBuildImage -Pdocker.registry=ghcr.io/octopusden --info
+      run: ./gradlew build dockerBuildImage -Ppublishing.docker.registry=ghcr.io/octopusden -Pdocker.registry=docker.io --info
       env:
         BUILD_VERSION: ${{ steps.version.outputs.group1 }}
     - name: Publish
