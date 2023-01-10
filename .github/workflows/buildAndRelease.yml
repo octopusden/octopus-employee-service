@@ -3,6 +3,10 @@ name: BUILD AND RELEASE
 on:
   workflow_dispatch:
     inputs:
+      PUBLISH_TO_SONATYPE:
+        description: 'Publish to sonatype'
+        required: true
+        default: true
       COMMIT:
         description: 'ID of commit'
         required: true
@@ -47,21 +51,23 @@ jobs:
       run: ./gradlew build dockerBuildImage -x test -Ppublishing.docker.registry=ghcr.io/octopusden -Pdocker.registry=docker.io -Pversion=${{ steps.version.outputs.group1 }} --info
       env:
         BUILD_VERSION: ${{ steps.version.outputs.group1 }}
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish
-      if: ${{ !endsWith(steps.version.outputs.group1, 'SNAPSHOT') }}
-      run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository :employee-service:dockerPushImage -Pversion=${{ steps.version.outputs.group1 }}
+      if: ${{ inputs.PUBLISH_TO_SONATYPE }}
+      run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -Pversion=${{ steps.version.outputs.group1 }}
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
         BUILD_VERSION: ${{ steps.version.outputs.group1 }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Push to docker registry
+      run: docker push ghcr.io/octopusden/employee-service-staging:${{ steps.version.outputs.group1 }}
     - name: Create Release
       uses: marvinpinto/action-automatic-releases@master
       with:
