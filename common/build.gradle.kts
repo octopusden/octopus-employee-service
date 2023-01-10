@@ -11,6 +11,27 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            pom {
+                name.set(project.name)
+                description.set("Octopus module: ${project.name}")
+                url.set("https://github.com/octopusden/octopus-employee-service.git")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/kzaporozhtsev/octopus-employee-service.git")
+                    connection.set("scm:git://github.com/octopusden/octopus-employee-service.git")
+                }
+                developers {
+                    developer {
+                        id.set("octopus")
+                        name.set("octopus")
+                    }
+                }
+            }
         }
     }
 }
