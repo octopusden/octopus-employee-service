@@ -2,7 +2,7 @@ name: BUILD AND RELEASE
 
 on:
   repository_dispatch:
-    types: release
+    types: [ release ]
 
 jobs:
   build:
