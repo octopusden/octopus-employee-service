@@ -1,19 +1,8 @@
 name: BUILD AND RELEASE
 
 on:
-  workflow_dispatch:
-    inputs:
-      PUBLISH_TO_SONATYPE:
-        description: 'Publish to sonatype'
-        required: true
-        default: true
-      COMMIT:
-        description: 'ID of commit'
-        required: true
-      BUILD_VERSION:
-        description: 'Build version'
-        default: '1.0-SNAPSHOT'
-        required: true
+  repository_dispatch:
+    types: release
 
 jobs:
   build:
@@ -23,7 +12,7 @@ jobs:
     - uses: actions/checkout@v3
       name: Checkout(switching to commit)
       with:
-        ref: ${{ inputs.COMMIT }}
+        ref: ${{ github.event.client_payload.commit }}
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
@@ -36,13 +25,13 @@ jobs:
       id: version
       name: Prepare a version from a tag
       with:
-        text: ${{ inputs.BUILD_VERSION }}
+        text: ${{ github.event.client_payload.build_version }}
         regex: '^v([0-9]+\.[0-9]+\.[0-9]+)$'
         flags: gm
     - name: Check version format
       if: ${{ steps.version.outputs.group1 == '' }}
       run: |
-        echo "Version must to match format 'v([0-9]+\.[0-9]+\.[0-9]+)$' but has value ${{ inputs.BUILD_VERSION }}"
+        echo "Version must to match format 'v([0-9]+\.[0-9]+\.[0-9]+)$' but has value ${{ github.event.client_payload.build_version }}"
         exit 1
     - name: GitHub Tag Name
       run: |
@@ -52,7 +41,6 @@ jobs:
       env:
         BUILD_VERSION: ${{ steps.version.outputs.group1 }}
     - name: Publish
-      if: ${{ inputs.PUBLISH_TO_SONATYPE }}
       run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -Pversion=${{ steps.version.outputs.group1 }}
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -73,4 +61,4 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         prerelease: false
-        automatic_release_tag: ${{ github.event.input.BUILD_VERSION }}
+        automatic_release_tag: ${{ github.event.client_payload.build_version }}
