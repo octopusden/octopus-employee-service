@@ -55,7 +55,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Push to docker registry
-      run: docker push ghcr.io/octopusden/employee-service-staging:${{ steps.version.outputs.group1 }}
+      run: docker push ghcr.io/octopusden/employee-service:${{ steps.version.outputs.group1 }}
     - name: Create Release
       uses: marvinpinto/action-automatic-releases@master
       with:
