@@ -15,6 +15,12 @@ class ActuatorControllerTest {
         Assertions.assertEquals(buildVersion, serverInfo.build.version)
     }
 
+    @Test
+    fun testOneCHealth() {
+        val health = client.oneCHealth()
+        Assertions.assertEquals("UP", health.status)
+    }
+
     companion object {
         private val client = TestFtUtils.Companion.getUnsecuredClient()
     }

@@ -13,4 +13,7 @@ interface OneCClient {
         @Param("dateFrom", expander = LocalDateExpander::class) fromDate: LocalDate,
         @Param("dateTo", expander = LocalDateExpander::class) toDate: LocalDate
     ): List<PlannedTimeDTO>
+
+    @RequestLine("GET ru/hs/ow_http/ping")
+    fun getHealth()
 }
