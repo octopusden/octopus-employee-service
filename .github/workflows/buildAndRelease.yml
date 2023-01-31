@@ -29,19 +29,19 @@ jobs:
         exit-if-empty: true
     - name: GitHub Tag Name
       run: |
-        echo "Current version: ${{ steps.version.outputs.group1 }}"
+        echo "Current version: ${{ steps.version.outputs.version }}"
     - name: Build with Gradle
-      run: ./gradlew build dockerBuildImage -x test -Ppublishing.docker.registry=ghcr.io/octopusden -Pdocker.registry=docker.io -Pversion=${{ steps.version.outputs.group1 }} --info
+      run: ./gradlew build dockerBuildImage -x test -Ppublishing.docker.registry=ghcr.io/octopusden -Pdocker.registry=docker.io -Pversion=${{ steps.version.outputs.version }} --info
       env:
-        BUILD_VERSION: ${{ steps.version.outputs.group1 }}
+        BUILD_VERSION: ${{ steps.version.outputs.version }}
     - name: Publish
-      run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -Pversion=${{ steps.version.outputs.group1 }}
+      run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -Pversion=${{ steps.version.outputs.version }}
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_PASSPHRASE }}
-        BUILD_VERSION: ${{ steps.version.outputs.group1 }}
+        BUILD_VERSION: ${{ steps.version.outputs.version }}
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
@@ -49,7 +49,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Push to docker registry
-      run: docker push ghcr.io/octopusden/employee-service:${{ steps.version.outputs.group1 }}
+      run: docker push ghcr.io/octopusden/employee-service:${{ steps.version.outputs.version }}
     - name: Create Release
       uses: marvinpinto/action-automatic-releases@master
       with:
