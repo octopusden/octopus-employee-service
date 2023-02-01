@@ -10,6 +10,7 @@ import feign.CollectionFormat
 import feign.Param
 import feign.QueryMap
 import feign.RequestLine
+import org.octopusden.employee.client.common.dto.Health
 import java.time.LocalDate
 
 interface EmployeeServiceClient {
@@ -39,4 +40,7 @@ interface EmployeeServiceClient {
 
     @RequestLine("GET customers")
     fun getCustomers(): Set<CustomerDTO>
+
+    @RequestLine("GET actuator/health/oneC")
+    fun oneCHealth(): Health
 }

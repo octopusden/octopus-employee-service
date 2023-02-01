@@ -58,6 +58,7 @@ open class MigrateMockData : DefaultTask() {
     companion object {
         private const val jqlTemplate = "Employee in (%s) AND project in (\"Calendar RCIS\", \"Calendar\") AND \"Leave from date\" <= startOfDay() AND \"Leave to date\" >= endOfDay() AND status not in (Canceled, Rejected)"
         private val endpointToResponseFileName = mapOf(
+            "/one-c/ru/hs/ow_http/ping" to emptyMap<String, String>() to "one-c-health.json",
             "/one-c/ru/hs/ow_http/getPlannedTime" to mapOf(
                 "dateFrom" to "2021-01-01",
                 "dateTo" to "2021-01-31",

@@ -17,6 +17,7 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
+import org.octopusden.employee.client.common.dto.Health
 import java.nio.charset.Charset
 import java.time.LocalDate
 import java.util.Base64
@@ -52,6 +53,8 @@ class ClassicEmployeeServiceClient(
     fun updateApiParameters(apiParametersProvider: EmployeeServiceClientParametersProvider) {
         client = createClient(apiParametersProvider, mapper)
     }
+
+    override fun oneCHealth(): Health = client.oneCHealth()
 
     companion object {
         private val base64Encoder = Base64.getEncoder()
