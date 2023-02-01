@@ -36,7 +36,10 @@ logging.level:
   org.springframework.web.reactive.function.client: TRACE
 
 management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
-        include: info
+        include: info,health
