@@ -3,7 +3,7 @@ version: '3'
 services:
   employee-service:
     container_name: ft-employee-service
-    image: ${PUBLISHING_DOCKER_REGISTRY}/employee-service:${APP_VERSION}
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/employee-service:${APP_VERSION}
     ports:
       - "8080:8080"
     environment:
@@ -16,7 +16,7 @@ services:
 
   api-gateway:
     container_name: ft-api-gateway
-    image: ghcr.io/octopusden/api-gateway:2.0.1
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/api-gateway:2.0.1
     ports:
       - "8765:8765"
     volumes:
