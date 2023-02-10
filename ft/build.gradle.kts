@@ -2,18 +2,54 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.14.3"
 }
 
+val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String
+val publishingDockerRegistry = System.getenv().getOrDefault("PUBLISHING_DOCKER_REGISTRY", project.properties["publishing.docker.registry"]) as? String
+val authServerUrl = System.getenv().getOrDefault("AUTH_SERVER_URL", project.properties["auth-server.url"]) as? String
+val authServerRealm = System.getenv().getOrDefault("AUTH_SERVER_REALM", project.properties["auth-server.realm"]) as? String
+val authServerClientId = System.getenv().getOrDefault("AUTH_SERVER_CLIENT_ID", project.properties["auth-server.client-id"]) as? String
+val authServerClientSecret = System.getenv().getOrDefault("AUTH_SERVER_CLIENT_SECRET", project.properties["auth-server.client-secret"]) as? String
+val employeeServiceUser = System.getenv().getOrDefault("EMPLOYEE_SERVICE_USER", project.properties["employee-service.user"]) as? String
+val employeeServicePassword = System.getenv().getOrDefault("EMPLOYEE_SERVICE_PASSWORD", project.properties["employee-service.password"]) as? String
+
 dockerCompose {
     useComposeFiles.add("${projectDir}${File.separator}docker${File.separator}docker-compose.yml")
     waitForTcpPorts = true
-
-    environment["APP_VERSION"] = project.version
-    project.properties["docker.registry"]
-        ?.let { environment["DOCKER_REGISTRY"] = it }
-    project.properties["publishing.docker.registry"]
-        ?.let { environment["PUBLISHING_DOCKER_REGISTRY"] = it }
-    project.properties["auth-server.url"]
-        ?.let { environment["AUTH_SERVER_URL"] }
     captureContainersOutputToFiles = File("$buildDir${File.separator}docker_logs")
+    environment.putAll(
+        mapOf(
+            "APP_VERSION" to project.version,
+            "DOCKER_REGISTRY" to dockerRegistry,
+            "PUBLISHING_DOCKER_REGISTRY" to publishingDockerRegistry,
+            "AUTH_SERVER_URL" to authServerUrl,
+            "AUTH_SERVER_REALM" to authServerRealm,
+            "AUTH_SERVER_CLIENT_ID" to authServerClientId,
+            "AUTH_SERVER_CLIENT_SECRET" to authServerClientSecret
+        )
+    )
+}
+
+tasks.getByName("composeUp").doFirst {
+    if (dockerRegistry.isNullOrBlank() || publishingDockerRegistry.isNullOrBlank() ||
+        authServerUrl.isNullOrBlank() || authServerRealm.isNullOrBlank() ||
+        authServerClientId.isNullOrBlank() || authServerClientSecret.isNullOrBlank()
+    ) {
+        throw IllegalArgumentException(
+            "Start gradle build with" +
+                    (if (dockerRegistry.isNullOrBlank()) " -Pdocker.registry=..." else "") +
+                    (if (publishingDockerRegistry.isNullOrBlank()) " -Ppublishing.docker.registry=..." else "") +
+                    (if (authServerUrl.isNullOrBlank()) " -Pauth-server.url=..." else "") +
+                    (if (authServerRealm.isNullOrBlank()) " -Pauth-server.realm=..." else "") +
+                    (if (authServerClientId.isNullOrBlank()) " -Pauth-server.client-id=..." else "") +
+                    (if (authServerClientSecret.isNullOrBlank()) " -Pauth-server.client-secret=..." else "") +
+                    " or set env variable(s):" +
+                    (if (dockerRegistry.isNullOrBlank()) " DOCKER_REGISTRY" else "") +
+                    (if (publishingDockerRegistry.isNullOrBlank()) " PUBLISHING_DOCKER_REGISTRY" else "") +
+                    (if (authServerUrl.isNullOrBlank()) " AUTH_SERVER_URL" else "") +
+                    (if (authServerRealm.isNullOrBlank()) " AUTH_SERVER_REALM" else "") +
+                    (if (authServerClientId.isNullOrBlank()) " AUTH_SERVER_CLIENT_ID" else "") +
+                    (if (authServerClientSecret.isNullOrBlank()) " AUTH_SERVER_CLIENT_SECRET" else "")
+        )
+    }
 }
 
 sourceSets {
@@ -32,10 +68,28 @@ ftImplementation.isCanBeResolved = true
 configurations["ftRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 val ft by tasks.creating(Test::class) {
-    systemProperties = mapOf("buildVersion" to version)
+    doFirst {
+        if (employeeServiceUser.isNullOrBlank() || employeeServicePassword.isNullOrBlank()) {
+            throw IllegalArgumentException(
+                "Start gradle build with" +
+                        (if (employeeServiceUser.isNullOrBlank()) " -Pemployee-service.user=..." else "") +
+                        (if (employeeServicePassword.isNullOrBlank()) " -Pemployee-service.password=..." else "") +
+                        " or set env variable(s):" +
+                        (if (employeeServiceUser.isNullOrBlank()) " EMPLOYEE_SERVICE_USER" else "") +
+                        (if (employeeServicePassword.isNullOrBlank()) " EMPLOYEE_SERVICE_PASSWORD" else "")
+            )
+        }
+    }
+
+    systemProperties.putAll(
+        mapOf(
+            "buildVersion" to project.version,
+            "employee-service.user" to employeeServiceUser,
+            "employee-service.password" to employeeServicePassword
+        )
+    )
     group = "verification"
     description = "Runs the integration tests"
-
     testClassesDirs = sourceSets["ft"].output.classesDirs
     classpath = sourceSets["ft"].runtimeClasspath
 }

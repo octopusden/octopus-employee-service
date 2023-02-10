@@ -1,0 +1,56 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay
+      routes:
+        - id: employee-service
+          uri: http://employee-service:8080
+          predicates:
+            - Path=/employee-service/**
+          filters:
+            - RewritePath=/(?<base>.*?)/(?<segment>.*), /$\{segment}
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            token-uri: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/token
+            authorization-uri: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/auth
+            userinfo-uri: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: ${auth-server.client-id}
+            client-secret: ${auth-server.client-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: F1 Authentication Server
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+    loggers:
+      enabled: true
+
+auth-server:
+  url: # set via env
+  logout-url: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/logout?redirect_uri=http://localhost:8765
+  realm: # set via env
+  client-id: # set via env
+  client-secret: # set via env
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web.reactive.function.client: TRACE
