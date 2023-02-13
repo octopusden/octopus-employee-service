@@ -73,7 +73,7 @@ docker {
     springBootApplication {
         baseImage.set("$dockerRegistry/openjdk:11")
         ports.set(listOf(8080, 8080))
-        images.set(setOf("$octopusGithubDockerRegistry/${project.name}:${project.version}"))
+        images.set(setOf("$octopusGithubDockerRegistry/octopusden/${project.name}:${project.version}"))
     }
 }
 
