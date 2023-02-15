@@ -1,30 +1,6 @@
-employee-service:
-  user-availability:
-    jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
-
-service-registry:
-  username: user
-  password: password
-
 eureka:
   client:
-    serviceUrl:
-      defaultZone: #example http://user:password@localhost:8761/eureka/
-
-one-c:
-  host: # set via EnvFile
-  username:
-  password:
-
-jira1:
-  host: # set via EnvFile
-  username:
-  password:
-
-jira2:
-  host: # set via EnvFile
-  username:
-  password:
+    enabled: false
 
 spring:
   security:
@@ -35,7 +11,27 @@ spring:
 
 auth-server:
   url: # set via EnvFile
-  realm:
+  realm: # set via EnvFile
+
+one-c:
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
+
+jira1:
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
+
+jira2:
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
+
+employee-service:
+  work-day-hours: 8
+  user-availability:
+    jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
 
 logging.level:
   org.springframework.security: DEBUG

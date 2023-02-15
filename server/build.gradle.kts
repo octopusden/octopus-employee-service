@@ -19,6 +19,11 @@ repositories {
     mavenCentral()
 }
 
+val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String
+val octopusGithubDockerRegistry = System.getenv().getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]) as? String
+val authServerUrl = System.getenv().getOrDefault("AUTH_SERVER_URL", project.properties["auth-server.url"]) as? String
+val authServerRealm = System.getenv().getOrDefault("AUTH_SERVER_REALM", project.properties["auth-server.realm"]) as? String
+
 tasks.getByName<Jar>("jar") {
     enabled = false
 }
@@ -66,25 +71,34 @@ springBoot {
 
 docker {
     springBootApplication {
-        baseImage.set("${rootProject.properties["docker.registry"]}/openjdk:11")
+        baseImage.set("$dockerRegistry/openjdk:11")
         ports.set(listOf(8080, 8080))
-        images.set(setOf("${rootProject.properties["publishing.docker.registry"]}/${project.name}:${project.version}"))
+        images.set(setOf("$octopusGithubDockerRegistry/octopusden/${project.name}:${project.version}"))
+    }
+}
+
+tasks.getByName("dockerBuildImage").doFirst {
+    if (dockerRegistry.isNullOrBlank() || octopusGithubDockerRegistry.isNullOrBlank()) {
+        throw IllegalArgumentException(
+            "Start gradle build with" +
+                    (if (dockerRegistry.isNullOrBlank()) " -Pdocker.registry=..." else "") +
+                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " -Poctopus.github.docker.registry=..." else "") +
+                    " or set env variable(s):" +
+                    (if (dockerRegistry.isNullOrBlank()) " DOCKER_REGISTRY" else "") +
+                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " OCTOPUS_GITHUB_DOCKER_REGISTRY" else "")
+        )
     }
 }
 
 dockerCompose {
     useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
     waitForTcpPorts = true
-
-    (System.getenv().get("DOCKER_REGISTRY") ?: project.properties["docker.registry"])
-        ?.let {
-            environment["DOCKER_REGISTRY"] = it
-        }
-    (System.getenv().get("PUBLISHING_DOCKER_REGISTRY") ?: project.properties["publishing.docker.registry"])
-        ?.let {
-            environment["PUBLISHING_DOCKER_REGISTRY"] = it
-        }
     captureContainersOutputToFiles = File("$buildDir${File.separator}/docker_logs")
+    environment.putAll(mapOf("DOCKER_REGISTRY" to dockerRegistry))
+}
+
+tasks.getByName("composeUp").doFirst {
+    if (dockerRegistry.isNullOrBlank()) throw IllegalArgumentException("Start gradle build with -Pdocker.registry=... or set env variable(s): DOCKER_REGISTRY")
 }
 
 sourceSets {
@@ -97,6 +111,21 @@ sourceSets {
 
 tasks.withType<Test> {
     dependsOn("migrateMockData")
+
+    doFirst {
+        if (authServerUrl.isNullOrBlank() || authServerRealm.isNullOrBlank()) {
+            throw IllegalArgumentException(
+                "Start gradle build with" +
+                        (if (authServerUrl.isNullOrBlank()) " -Pauth-server.url=..." else "") +
+                        (if (authServerRealm.isNullOrBlank()) " -Pauth-server.realm=..." else "") +
+                        " or set env variable(s):" +
+                        (if (authServerUrl.isNullOrBlank()) " AUTH_SERVER_URL" else "") +
+                        (if (authServerRealm.isNullOrBlank()) " AUTH_SERVER_REALM" else "")
+            )
+        }
+    }
+
+    environment.putAll(mapOf("AUTH_SERVER_URL" to authServerUrl, "AUTH_SERVER_REALM" to authServerRealm))
 }
 
 dockerCompose.isRequiredBy(tasks["test"])

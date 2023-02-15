@@ -1,3 +1,30 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${auth-server.url}/realms/${auth-server.realm}
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+    loggers:
+      enabled: true
+
+auth-server:
+  url: # set via env
+  logout-url: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/logout?redirect_uri=http://localhost:8765/employee-service/swagger-ui/index.html
+  realm: # set via env
+
 employee-service:
   work-day-hours: 8
   user-availability:
@@ -7,6 +34,7 @@ one-c:
   host: http://mockserver:1080/one-c
   username: oneCUser
   password: oneCPassword
+
 jira1:
   host: http://mockserver:1080/jira1
   username: jiraUser
@@ -17,29 +45,6 @@ jira2:
   username: jira2User
   password: jira2Password
 
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${auth-server.url}/realms/${auth-server.realm}
-  cloud:
-    discovery:
-      enabled: false
-
-auth-server:
-  url: # set via env
-  realm:
-
 logging.level:
   org.springframework.security: DEBUG
   org.springframework.web.reactive.function.client: TRACE
-
-management:
-  endpoint:
-    health:
-      show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: info,health

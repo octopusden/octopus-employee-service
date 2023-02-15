@@ -68,8 +68,6 @@ subprojects {
     val migrateMockData by tasks.creating(MigrateMockData::class) {
         this.testDataDir = rootDir.toString() + File.separator + "test-data"
     }
-
 }
-
 
 tasks.findByName("publish")?.dependsOn(":employee-service:dockerPushImage")
