@@ -1,12 +1,23 @@
-employee-service:
-  work-day-hours: 8
-  user-availability:
-    jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
+eureka:
+  client:
+    enabled: false
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${auth-server.url}/realms/${auth-server.realm}
+
+auth-server:
+  url: # set via env
+  realm: # set via env
 
 one-c:
   host: http://localhost:1080/one-c
   username: oneCUser
   password: oneCPassword
+
 jira1:
   host: http://localhost:1080/jira1
   username: jiraUser
@@ -17,16 +28,7 @@ jira2:
   username: jira2User
   password: jira2Password
 
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${auth-server.url}/realms/${auth-server.realm}
-  cloud:
-    discovery:
-      enabled: false
-
-auth-server:
-  url: # set via env
-  realm:
+employee-service:
+  work-day-hours: 8
+  user-availability:
+    jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)

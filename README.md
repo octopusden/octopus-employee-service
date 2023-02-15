@@ -1,18 +1,18 @@
 # Employee Service
 
-### Build
+## JDK version
 
-```shell
+11
 
-./gradlew build dockerBuildImage -Pdocker.registry={DOCKER_REGISTRY} -Ppublishing.docker.registry={PUBLISHING_DOCKER_REGISTRY}
-```
+## Project properties
 
-{DOCKER_REGISTRY} - the host of a docker registry where base images will be pulled(example: docker.io)
-{PUBLISHING_DOCKER_REGISTRY} - the host and the namespace of a docker registry where the current image will be pushed(example: ghcr.io/octopusden)
-
-### Environment variables
-
------
-AUTH_SERVER_URL - the URL of an auth server
-AUTH_SERVER_REALM - the name of realm to call from an auth server
-TECHNICAL_USER_BEARER - the token for a technical user
+| Name                           | Description                                                      | UT    | FT    | BUILD AND RELEASE |
+|--------------------------------|------------------------------------------------------------------|-------|-------|-------------------|
+| docker.registry                | Docker registry where 3rd-party base images will be pulled from. | **+** | **+** | **+**             |
+| octopus.github.docker.registry | Docker registry with octopus images.                             |       | **+** | **+**             |
+| auth-server.url                | Auth server URL.                                                 | **+** | **+** |                   |
+| auth-server.realm              | Auth server realm.                                               | **+** | **+** |                   |
+| auth-server.client-id          | octopus-api-gateway client Id.                                   |       | **+** |                   |
+| auth-server.client-secret      | octopus-api-gateway client secret.                               |       | **+** |                   |
+| employee-service.user          | octopus-employee-service user.                                   |       | **+** |                   |
+| employee-service.password      | octopus-employee-service user password.                          |       | **+** |                   |

@@ -2,7 +2,8 @@ version: '3'
 
 services:
   employee-service:
-    image: ${PUBLISHING_DOCKER_REGISTRY}/employee-service:${APP_VERSION:-1.0-SNAPSHOT}
+    container_name: ft-employee-service
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/employee-service:${APP_VERSION}
     ports:
       - "8080:8080"
     environment:
@@ -13,7 +14,31 @@ services:
     volumes:
       - ./employee-service.yaml:/application.yaml
 
+  api-gateway:
+    container_name: ft-api-gateway
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/api-gateway:2.0.1
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./api-gateway.yaml:/application.yaml
+    environment:
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - AUTH_SERVER_URL=${AUTH_SERVER_URL}
+      - AUTH_SERVER_REALM=${AUTH_SERVER_REALM}
+      - AUTH_SERVER_CLIENT_ID=${AUTH_SERVER_CLIENT_ID}
+      - AUTH_SERVER_CLIENT_SECRET=${AUTH_SERVER_CLIENT_SECRET}
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=/
+    depends_on:
+      - employee-service
+    healthcheck:
+      #unable to use health endpoint: migrateMockData is not done yet -> one-c ping fails
+      test: [ "CMD", "curl", "-f", "http://localhost:8765/employee-service/actuator/info" ]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+
   mockserver:
+    container_name: ft-mockserver
     image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.11.1
     ports:
       - "1080:1080"
