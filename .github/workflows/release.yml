@@ -1,4 +1,4 @@
-name: BUILD AND RELEASE
+name: RELEASE
 
 on:
   repository_dispatch:
