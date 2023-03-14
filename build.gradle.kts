@@ -15,7 +15,7 @@ autoUpdateDependencies {
 }
 
 allprojects {
-    group = "org.octopusden.octopus-employee"
+    group = "org.octopusden.employee"
 }
 
 nexusPublishing {

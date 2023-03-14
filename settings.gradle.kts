@@ -16,7 +16,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "employee-service"
+rootProject.name = "octopus-employee-service"
 
 include(":server")
 findProject(":server")?.name = "employee-service"
