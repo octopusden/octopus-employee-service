@@ -4,14 +4,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     idea
-    id("org.octopusden.release-management")
     id("org.jetbrains.kotlin.jvm") apply (false)
     id("io.github.gradle-nexus.publish-plugin")
     signing
-}
-
-autoUpdateDependencies {
-    component(mapOf("name" to "cloud-commons", "projectProperty" to "cloud-commons.version"))
 }
 
 allprojects {
