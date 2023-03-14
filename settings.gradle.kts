@@ -1,7 +1,6 @@
 pluginManagement {
     plugins {
         val kotlinVersion = extra["kotlin.version"] as String
-        id("org.octopusden.release-management") version(extra["release-management.version"] as String)
         id("org.springframework.boot") version (extra["spring-boot.version"] as String)
         id("org.jetbrains.kotlin.jvm") version kotlinVersion
         id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
@@ -16,7 +15,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "employee-service"
+rootProject.name = "octopus-employee-service"
 
 include(":server")
 findProject(":server")?.name = "employee-service"
