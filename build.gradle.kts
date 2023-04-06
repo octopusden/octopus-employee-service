@@ -60,6 +60,9 @@ subprojects {
         }
     }
 
+    java.sourceCompatibility = JavaVersion.VERSION_1_8
+    java.targetCompatibility = JavaVersion.VERSION_1_8
+
     val migrateMockData by tasks.creating(MigrateMockData::class) {
         this.testDataDir = rootDir.toString() + File.separator + "test-data"
     }
