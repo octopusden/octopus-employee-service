@@ -1,3 +1,5 @@
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+
 plugins {
     `maven-publish`
 }
@@ -46,6 +48,9 @@ signing {
 java {
     withJavadocJar()
     withSourcesJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 dependencies {

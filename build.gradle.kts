@@ -1,3 +1,4 @@
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.octopusden.task.MigrateMockData
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -33,6 +34,9 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
     }
 
     repositories {
