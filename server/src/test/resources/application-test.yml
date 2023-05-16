@@ -32,3 +32,9 @@ employee-service:
   work-day-hours: 8
   user-availability:
     jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
+
+octopus-security:
+  roles:
+    ROLE_EMPLOYEE_SERVICE_TECHNICAL_USER:
+      - ACCESS_EMPLOYEE
+      - ACCESS_CUSTOMER

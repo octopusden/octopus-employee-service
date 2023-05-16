@@ -48,3 +48,9 @@ jira2:
 logging.level:
   org.springframework.security: DEBUG
   org.springframework.web.reactive.function.client: TRACE
+
+octopus-security:
+  roles:
+    ROLE_EMPLOYEE_SERVICE_TECHNICAL_USER:
+      - ACCESS_EMPLOYEE
+      - ACCESS_CUSTOMER
