@@ -51,6 +51,6 @@ logging.level:
 
 octopus-security:
   roles:
-    ROLE_EMPLOYEE_SERVICE_TECHNICAL_USER:
+    EMPLOYEE_SERVICE_USER_DEV:
       - ACCESS_EMPLOYEE
       - ACCESS_CUSTOMER
