@@ -13,7 +13,7 @@ spring:
           predicates:
             - Path=/employee-service/**
           filters:
-            - RewritePath=/(?<base>.*?)/(?<segment>.*), /$\{segment}
+            - StripPrefix=1
   security:
     oauth2:
       client:

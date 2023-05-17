@@ -27,7 +27,7 @@ import java.util.*
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @ActiveProfiles("test")
-@WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_TECHNICAL_USER"])
+@WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
 class EmployeesControllerTest : BaseEmployeesControllerTest() {
     @Autowired
     private lateinit var mvc: MockMvc
