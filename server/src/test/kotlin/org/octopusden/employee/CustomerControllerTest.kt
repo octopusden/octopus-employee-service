@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @ActiveProfiles("test")
-@WithMockUser(authorities = ["EMPLOYEE_SERVICE_USER_DEV"])
+@WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
 class CustomerControllerTest : BaseCustomersControllerTest() {
     @Autowired
     private lateinit var mvc: MockMvc

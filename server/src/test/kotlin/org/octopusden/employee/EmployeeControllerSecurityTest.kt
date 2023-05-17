@@ -41,7 +41,7 @@ class EmployeeControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(authorities = ["EMPLOYEE_SERVICE_USER_DEV"])
+    @WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
     fun getRequiredTimeByAuthorizedUserTest() {
         getRequiredTimeRequest(MockMvcResultMatchers.status().is2xxSuccessful)
     }

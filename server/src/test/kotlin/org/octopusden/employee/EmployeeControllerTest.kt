@@ -30,7 +30,7 @@ import java.util.Locale
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @ActiveProfiles("test")
-@WithMockUser(authorities = ["EMPLOYEE_SERVICE_USER_DEV"])
+@WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
 class EmployeeControllerTest : BaseEmployeeControllerTest() {
 
     @Autowired
