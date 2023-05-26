@@ -151,8 +151,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.octopusden.octopus-cloud-commons:octopus-security-common:${project.properties["cloud-commons.version"]}")
 
-    implementation("io.springfox:springfox-boot-starter:3.0.0")
-    implementation("io.springfox:springfox-swagger-ui:3.0.0")
+    implementation("org.springdoc:springdoc-openapi-ui:${project.properties["springdoc.version"]}")
+    implementation("org.springdoc:springdoc-openapi-kotlin:${project.properties["springdoc.version"]}")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
