@@ -49,6 +49,9 @@ logging.level:
   org.springframework.security: DEBUG
   org.springframework.web.reactive.function.client: TRACE
 
+server:
+  forward-headers-strategy: framework
+
 octopus-security:
   roles:
     ROLE_EMPLOYEE_SERVICE_USER_DEV:
