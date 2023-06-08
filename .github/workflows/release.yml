@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@main
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@debug-sonatype-publishing
     with:
       flow-type: hybrid
       java-version: '11'
