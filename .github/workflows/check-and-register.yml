@@ -11,5 +11,5 @@ jobs:
     uses: octopusden/octopus-base/.github/workflows/common-check-and-register-release.yml@v2.1.7
     if:  "${{ github.event.workflow_run.conclusion == 'success' }}"
     with:
-      artifact-pattern: "octopus-employee/employee-service/_VER_/employee-service-_VER_.jar"
+      artifact-pattern: "octopus/employee/employee-service/_VER_/employee-service-_VER_.jar"
     secrets: inherit
