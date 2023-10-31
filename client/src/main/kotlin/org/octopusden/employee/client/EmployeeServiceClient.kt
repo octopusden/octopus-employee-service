@@ -36,7 +36,7 @@ interface EmployeeServiceClient {
 
     @Throws(NotFoundException::class)
     @RequestLine("GET employees/available-earlier?employees={employees}", collectionFormat = CollectionFormat.CSV)
-    fun getEmployeeAvailableEarlier(@Param("employees") @QueryMap employees: List<String>): Employee
+    fun getEmployeeAvailableEarlier(@Param("employees") employees: Set<String>): Employee
 
     @RequestLine("GET customers")
     fun getCustomers(): Set<CustomerDTO>

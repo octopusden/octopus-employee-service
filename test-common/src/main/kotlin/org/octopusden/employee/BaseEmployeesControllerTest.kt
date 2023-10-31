@@ -12,20 +12,20 @@ import java.util.stream.Stream
 abstract class BaseEmployeesControllerTest : BaseTest() {
     @ParameterizedTest
     @MethodSource("availableEarlier")
-    fun getEmployeeAvailableEarlierTest(employees: List<String>, expectedEmployee: Employee) {
+    fun getEmployeeAvailableEarlierTest(employees: Set<String>, expectedEmployee: Employee) {
         val employeeAvailableEarlier = getEmployeeAvailableEarlier(employees)
         Assertions.assertEquals(expectedEmployee, employeeAvailableEarlier)
     }
 
-    protected abstract fun getEmployeeAvailableEarlier(employees: List<String>): Employee
+    protected abstract fun getEmployeeAvailableEarlier(employees: Set<String>): Employee
 
     //<editor-fold defaultstate="collapsed" desc="test data">
     private fun availableEarlier(): Stream<Arguments> = Stream.of(
         Arguments.of(
-            listOf("absent1", "absent2"), Employee("absent2", true)
+            setOf("absent1", "absent2"), Employee("absent2", true)
         ),
         Arguments.of(
-            listOf("absent1", "absent2", "employee"), Employee("employee", true)
+            setOf("absent1", "absent2", "employee"), Employee("employee", true)
         )
     )
     //</editor-fold>

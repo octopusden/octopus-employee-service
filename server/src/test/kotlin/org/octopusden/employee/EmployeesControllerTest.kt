@@ -40,7 +40,7 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
         mapper.setLocale(Locale.ENGLISH)
     }
 
-    override fun getEmployeeAvailableEarlier(employees: List<String>): Employee = mvc.perform(
+    override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee = mvc.perform(
         MockMvcRequestBuilders.get("/employees/available-earlier")
             .param("employees", *employees.toTypedArray())
             .accept(MediaType.APPLICATION_JSON)
