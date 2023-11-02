@@ -45,7 +45,7 @@ class ClassicEmployeeServiceClient(
 
     override fun getEmployee(employee: String): Employee = client.getEmployee(employee)
 
-    override fun getEmployeeAvailableEarlier(employees: List<String>): Employee =
+    override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee =
         client.getEmployeeAvailableEarlier(employees)
 
     override fun getCustomers(): Set<CustomerDTO> = client.getCustomers()
