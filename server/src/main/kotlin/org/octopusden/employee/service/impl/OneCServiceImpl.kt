@@ -2,6 +2,7 @@ package org.octopusden.employee.service.impl
 
 import org.octopusden.employee.client.common.dto.Employee
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
+import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.config.EmployeeServiceProperties
 import org.octopusden.employee.service.OneCService
 import org.octopusden.employee.service.onec.client.OneCClient
@@ -26,5 +27,9 @@ class OneCServiceImpl(
             employee,
             requiredDays.multiply(employeeServiceProperties.workDayHours.toBigDecimal()).toInt()
         )
+    }
+
+    override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
+        return oneCClient.getWorkingDays(fromDate, toDate)
     }
 }

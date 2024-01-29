@@ -1,9 +1,6 @@
 package org.octopusden.employee.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.octopusden.employee.service.onec.client.OneCBasicCredTokenRequestInterceptor
-import org.octopusden.employee.service.onec.client.OneCClient
-import org.octopusden.employee.service.onec.client.OneCRetry
 import feign.Feign
 import feign.Logger
 import feign.Request
@@ -11,6 +8,9 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
+import org.octopusden.employee.service.onec.client.OneCBasicCredTokenRequestInterceptor
+import org.octopusden.employee.service.onec.client.OneCClient
+import org.octopusden.employee.service.onec.client.OneCRetry
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,8 +28,6 @@ class OneCConfig(
         return Feign.builder()
             .client(ApacheHttpClient())
             .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, true))
-            .encoder(JacksonEncoder(objectMapper))
-            .decoder(JacksonDecoder(objectMapper))
             .encoder(JacksonEncoder(objectMapper))
             .decoder(JacksonDecoder(objectMapper))
             .retryer(OneCRetry())

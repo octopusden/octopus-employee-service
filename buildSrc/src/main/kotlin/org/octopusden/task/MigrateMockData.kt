@@ -63,17 +63,29 @@ open class MigrateMockData : DefaultTask() {
                 "dateFrom" to "2021-01-01",
                 "dateTo" to "2021-01-31",
                 "user" to "employee"
-            ) to "one-c-jan-01-31.json",
+            ) to "one-c-get-planned-time-jan-01-31.json",
             "/one-c/ru/hs/ow_http/getPlannedTime" to mapOf(
                 "dateFrom" to "2021-01-01",
                 "dateTo" to "2021-01-10",
                 "user" to "employee"
-            ) to "one-c-jan-01-10.json",
+            ) to "one-c-get-planned-time-jan-01-10.json",
             "/one-c/ru/hs/ow_http/getPlannedTime" to mapOf(
                 "dateFrom" to "2021-01-11",
                 "dateTo" to "2021-01-31",
                 "user" to "employee"
-            ) to "one-c-jan-11-31.json",
+            ) to "one-c-get-planned-time-jan-11-31.json",
+            "/one-c/ru/hs/ow_http/getWorkingDays" to mapOf(
+                "dateFrom" to "2021-01-01",
+                "dateTo" to "2021-01-10"
+            ) to "one-c-get-working-days-01-10.json",
+            "/one-c/ru/hs/ow_http/getWorkingDays" to mapOf(
+                "dateFrom" to "2021-01-01",
+                "dateTo" to "2021-01-31"
+            ) to "one-c-get-working-days-01-31.json",
+            "/one-c/ru/hs/ow_http/getWorkingDays" to mapOf(
+                "dateFrom" to "2021-01-11",
+                "dateTo" to "2021-01-31"
+            ) to "one-c-get-working-days-01-31.json",
             "/jira1/rest/api/2/user" to mapOf(
                 "username" to "employee",
             ) to "jira1/jira-employee.json",
