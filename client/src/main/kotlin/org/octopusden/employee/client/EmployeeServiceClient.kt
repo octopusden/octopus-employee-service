@@ -41,7 +41,7 @@ interface EmployeeServiceClient {
     @RequestLine("GET customers")
     fun getCustomers(): Set<CustomerDTO>
 
-    @RequestLine("GET employees/working-days")
+    @RequestLine("GET employees/working-days&fromDate={fromDate}&toDate={toDate}")
     fun getWorkingDays(
         @Param("fromDate", expander = LocalDateExpander::class) fromDate: LocalDate,
         @Param("toDate", expander = LocalDateExpander::class) toDate: LocalDate
