@@ -18,6 +18,7 @@ import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
 import org.octopusden.employee.client.common.dto.Health
+import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import java.nio.charset.Charset
 import java.time.LocalDate
 import java.util.Base64
@@ -49,6 +50,9 @@ class ClassicEmployeeServiceClient(
         client.getEmployeeAvailableEarlier(employees)
 
     override fun getCustomers(): Set<CustomerDTO> = client.getCustomers()
+
+    override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO =
+        client.getWorkingDays(fromDate, toDate)
 
     fun updateApiParameters(apiParametersProvider: EmployeeServiceClientParametersProvider) {
         client = createClient(apiParametersProvider, mapper)

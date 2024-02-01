@@ -1,7 +1,9 @@
 package org.octopusden.employee.service.impl
 
+import org.apache.http.HttpStatus
 import org.octopusden.employee.client.common.dto.Employee
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
+import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.config.EmployeeServiceProperties
 import org.octopusden.employee.service.EmployeeService
@@ -11,7 +13,6 @@ import org.octopusden.employee.service.jira.client.common.JiraClientException
 import org.octopusden.employee.service.jira.client.common.JiraUser
 import org.octopusden.employee.service.jira.client.jira1.Jira1Client
 import org.octopusden.employee.service.jira.client.jira2.Jira2Client
-import org.apache.http.HttpStatus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -76,7 +77,11 @@ class EmployeeServiceImpl(
                 .flatten()
                 .minByOrNull { it.end }
                 ?.let { Employee(it.employee.name, it.employee.active) } ?: throw IllegalStateException()
+    }
 
+    override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
+        return oneCService.getWorkingDays(fromDate, toDate)
+            .also { workingDaysDTO -> log.debug("getWorkingDays($fromDate,$toDate)=$workingDaysDTO") }
     }
 
     data class UserAbsence(val employee: JiraUser, val start: LocalDate, val end: LocalDate)

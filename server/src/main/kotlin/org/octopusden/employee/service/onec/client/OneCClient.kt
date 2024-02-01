@@ -1,9 +1,10 @@
 package org.octopusden.employee.service.onec.client
 
-import org.octopusden.employee.client.common.feign.LocalDateExpander
-import org.octopusden.employee.service.onec.client.dto.PlannedTimeDTO
 import feign.Param
 import feign.RequestLine
+import org.octopusden.employee.client.common.dto.WorkingDaysDTO
+import org.octopusden.employee.client.common.feign.LocalDateExpander
+import org.octopusden.employee.service.onec.client.dto.PlannedTimeDTO
 import java.time.LocalDate
 
 interface OneCClient {
@@ -16,4 +17,10 @@ interface OneCClient {
 
     @RequestLine("GET ru/hs/ow_http/ping")
     fun getHealth()
+
+    @RequestLine("GET ru/hs/ow_http/getWorkingDays?dateFrom={dateFrom}&dateTo={dateTo}")
+    fun getWorkingDays(
+        @Param("dateFrom", expander = LocalDateExpander::class) fromDate: LocalDate,
+        @Param("dateTo", expander = LocalDateExpander::class) toDate: LocalDate
+    ): WorkingDaysDTO
 }
