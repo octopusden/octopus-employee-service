@@ -1,6 +1,7 @@
 package org.octopusden.employee.controller
 
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.service.EmployeeService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,8 +18,9 @@ class EmployeesController(private val employeeService: EmployeeService) {
     fun getEmployeeAvailableEarlier(@RequestParam employees: Set<String>): Employee = employeeService.getEmployeeAvailableEarlier(employees)
 
     @GetMapping("working-days")
-    fun getWorkingDaysCount(
+    @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")
+    fun getWorkingDays(
         @RequestParam("fromDate", required = true) fromDate: LocalDate,
         @RequestParam("toDate", required = true) toDate: LocalDate
-    ) = employeeService.getWorkingDays(fromDate, toDate)
+    ): WorkingDaysDTO = employeeService.getWorkingDays(fromDate, toDate)
 }

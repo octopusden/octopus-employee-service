@@ -81,6 +81,7 @@ class EmployeeServiceImpl(
 
     override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
         return oneCService.getWorkingDays(fromDate, toDate)
+            .also { workingDaysDTO -> log.debug("getWorkingDays($fromDate,$toDate)=$workingDaysDTO") }
     }
 
     data class UserAbsence(val employee: JiraUser, val start: LocalDate, val end: LocalDate)
