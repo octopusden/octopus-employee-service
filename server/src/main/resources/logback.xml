@@ -9,8 +9,6 @@
         </encoder>
     </appender>
 
-    <logger level="debug" name="org.octopusden"/>
-
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
