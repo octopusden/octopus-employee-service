@@ -1,6 +1,15 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="EmployeeServiceApplication (dev)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="employee-service.employee-service.main" />
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <additionalParameters>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="spring.config.additional-location" />
+        <option name="value" value="server/dev/" />
+      </param>
+    </additionalParameters>
+    <module name="octopus-employee-service.employee-service.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.octopusden.employee.EmployeeServiceApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="true" />
@@ -12,17 +21,6 @@
         <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH="$USER_HOME$/dev.env" />
       </ENTRIES>
     </extension>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="org.octopusden.employee.EmployeeServiceApplication" />
-    <option name="ACTIVE_PROFILES" value="dev" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
-    <additionalParameters>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="spring.config.additional-location" />
-        <option name="value" value="server/dev/" />
-      </param>
-    </additionalParameters>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -14,7 +14,7 @@ private const val EXISTED_EMPLOYEE = "employee"
 class EmployeeControllerSecurityTest {
 
     private val securedClient = TestFtUtils.getSecuredClient()
-    private val unsecuredClient = TestFtUtils.getUnsecuredClient()
+    private val fakeTokenClient = TestFtUtils.getFakeTokenClient()
 
     @Test
     fun getRequiredTimeByAuthorizedUserTest() {
@@ -25,7 +25,7 @@ class EmployeeControllerSecurityTest {
     @Test
     fun getRequiredTimeByUnauthorizedTest() {
         Assertions.assertThrows(FeignException.Unauthorized::class.java) {
-            getRequiredTime(unsecuredClient)
+            getRequiredTime(fakeTokenClient)
         }
     }
 

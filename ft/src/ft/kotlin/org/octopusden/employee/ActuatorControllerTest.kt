@@ -22,6 +22,6 @@ class ActuatorControllerTest {
     }
 
     companion object {
-        private val client = TestFtUtils.Companion.getUnsecuredClient()
+        private val client = TestFtUtils.getUnsecuredClient()
     }
 }
