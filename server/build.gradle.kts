@@ -149,7 +149,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-    implementation("org.octopusden.octopus-cloud-commons:octopus-security-common:${project.properties["cloud-commons.version"]}")
+    implementation("org.octopusden.octopus-cloud-commons:octopus-security-common:${project.properties["octopus-cloud-commons.version"]}")
 
     implementation("org.springdoc:springdoc-openapi-ui:${project.properties["springdoc.version"]}")
     implementation("org.springdoc:springdoc-openapi-kotlin:${project.properties["springdoc.version"]}")
