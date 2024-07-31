@@ -16,9 +16,9 @@ class OneCHealthIndicator(
     override fun health(): Health {
         return try {
             oneCClient.getHealth()
-            return Health.up().build()
+            Health.up().build()
         } catch (e: Exception) {
-            return Health.down(e).build()
+            Health.down(e).build()
         }
     }
 }
