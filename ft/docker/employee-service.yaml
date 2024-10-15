@@ -34,6 +34,10 @@ one-c:
   host: http://mockserver:1080/one-c
   username: oneCUser
   password: oneCPassword
+  health:
+    user: testuser
+    startDate: 2021-01-01
+    endDate: 2021-01-02
 
 jira1:
   host: http://mockserver:1080/jira1

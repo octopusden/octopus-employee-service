@@ -49,4 +49,7 @@ interface EmployeeServiceClient {
 
     @RequestLine("GET actuator/health/oneC")
     fun oneCHealth(): Health
+
+    @RequestLine("GET admin/one-c-integration-check")
+    fun oneCInntegrationCheck(): Boolean
 }

@@ -61,6 +61,11 @@ open class MigrateMockData : DefaultTask() {
             "/one-c/ru/hs/ow_http/ping" to emptyMap<String, String>() to "one-c-health.json",
             "/one-c/ru/hs/ow_http/getPlannedTime" to mapOf(
                 "dateFrom" to "2021-01-01",
+                "dateTo" to "2021-01-02",
+                "user" to "testuser"
+            ) to "one-c-get-planned-time-jan-01-02.json",
+            "/one-c/ru/hs/ow_http/getPlannedTime" to mapOf(
+                "dateFrom" to "2021-01-01",
                 "dateTo" to "2021-01-31",
                 "user" to "employee"
             ) to "one-c-get-planned-time-jan-01-31.json",

@@ -10,12 +10,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
+import org.octopusden.employee.config.OneCProperties
 
 @Service
 @EnableConfigurationProperties(EmployeeServiceProperties::class)
 class OneCServiceImpl(
     private val oneCClient: OneCClient,
-    private val employeeServiceProperties: EmployeeServiceProperties
+    private val employeeServiceProperties: EmployeeServiceProperties,
+    private val oneCProperties: OneCProperties
 ) : OneCService {
 
     override fun getRequiredTime(employee: Employee, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO {
@@ -31,5 +33,19 @@ class OneCServiceImpl(
 
     override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
         return oneCClient.getWorkingDays(fromDate, toDate)
+    }
+
+    override fun isRequiredTimeValid(): Boolean {
+        return try {
+            oneCProperties.health?.let { health ->
+                val result = oneCClient.getPlannedTime(health.user, health.startDate, health.endDate)
+                if (result.isEmpty()) {
+                    throw IllegalArgumentException("No required time found for user ${health.user}")
+                }
+                true
+            } ?: false
+        } catch (e: Exception) {
+            throw IllegalStateException("Required time is not valid", e)
+        }
     }
 }

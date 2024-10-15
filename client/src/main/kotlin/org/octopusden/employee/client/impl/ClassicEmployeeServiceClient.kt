@@ -60,6 +60,8 @@ class ClassicEmployeeServiceClient(
 
     override fun oneCHealth(): Health = client.oneCHealth()
 
+    override fun oneCInntegrationCheck(): Boolean = client.oneCInntegrationCheck()
+
     companion object {
         private val base64Encoder = Base64.getEncoder()
         private fun getMapper(): ObjectMapper {

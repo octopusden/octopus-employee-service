@@ -8,4 +8,9 @@ import java.time.LocalDate
 interface OneCService {
     fun getRequiredTime(employee: Employee, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO
     fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO
+
+    /**
+     * Check if required time report is valid
+     */
+    fun isRequiredTimeValid(): Boolean
 }
