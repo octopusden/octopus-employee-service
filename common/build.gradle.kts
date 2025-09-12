@@ -1,4 +1,6 @@
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
@@ -53,11 +55,19 @@ java {
     }
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-annotations")
     api(platform("io.github.openfeign:feign-bom:11.9.1"))
     api("io.github.openfeign:feign-httpclient")
     api("io.github.openfeign:feign-jackson")
     api("io.github.openfeign:feign-slf4j")
+
     api("org.apache.httpcomponents:httpclient:4.5.13")
+
+    implementation("com.fasterxml.jackson.core:jackson-annotations")
 }

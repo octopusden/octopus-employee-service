@@ -35,7 +35,7 @@ subprojects {
         withJavadocJar()
         withSourcesJar()
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(21))
         }
     }
 
@@ -53,14 +53,14 @@ subprojects {
     }
 
     dependencies {
-        implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.3"))
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        implementation(platform("com.fasterxml.jackson:jackson-bom:2.14.2"))
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.properties["kotlin.version"]}")
     }
 
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
             suppressWarnings = true
-            jvmTarget = "1.8"
+            jvmTarget = "21"
         }
     }
 
