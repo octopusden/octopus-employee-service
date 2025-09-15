@@ -57,7 +57,9 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.properties["kotlin.version"]}")
+        constraints {
+            implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.properties["kotlin.version"]}")
+        }
     }
 
     val migrateMockData by tasks.creating(MigrateMockData::class) {
