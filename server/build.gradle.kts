@@ -19,6 +19,7 @@ repositories {
     mavenCentral()
 }
 
+val signingRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
 val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String
 val octopusGithubDockerRegistry = System.getenv().getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]) as? String
 val authServerUrl = System.getenv().getOrDefault("AUTH_SERVER_URL", project.properties["auth-server.url"]) as? String
@@ -59,6 +60,7 @@ publishing {
 }
 
 signing {
+    isRequired = signingRequired
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
@@ -93,7 +95,7 @@ tasks.getByName("dockerBuildImage").doFirst {
 dockerCompose {
     useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
     waitForTcpPorts = true
-    captureContainersOutputToFiles = File("$buildDir${File.separator}/docker_logs")
+    captureContainersOutputToFiles = layout.buildDirectory.dir("docker_logs").get().asFile
     environment.putAll(mapOf("DOCKER_REGISTRY" to dockerRegistry))
 }
 

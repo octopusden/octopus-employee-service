@@ -1,10 +1,11 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
 }
+
+val signingRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
 
 publishing {
     repositories {
@@ -41,15 +42,11 @@ publishing {
 }
 
 signing {
+    isRequired = signingRequired
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications["maven"])
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {
