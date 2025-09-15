@@ -57,7 +57,6 @@ subprojects {
     }
 
     dependencies {
-        implementation(platform("com.fasterxml.jackson:jackson-bom:2.14.2"))
         implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.properties["kotlin.version"]}")
     }
 
