@@ -50,15 +50,15 @@ signing {
 java {
     withJavadocJar()
     withSourcesJar()
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 8
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+    kotlinOptions.jvmTarget = "1.8"
+    compilerOptions.freeCompilerArgs.add("-Xjdk-release=1.8")
 }
 
 dependencies {

@@ -1,11 +1,10 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.octopusden.task.MigrateMockData
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
     idea
-    id("org.jetbrains.kotlin.jvm") apply (false)
+    id("org.jetbrains.kotlin.jvm")
     id("io.github.gradle-nexus.publish-plugin")
     signing
 }
@@ -34,9 +33,14 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
+        JavaVersion.VERSION_21.let {
+            sourceCompatibility = it
+            targetCompatibility = it
         }
+    }
+
+    kotlin {
+        compilerOptions.jvmTarget = JvmTarget.JVM_21
     }
 
     repositories {
@@ -55,13 +59,6 @@ subprojects {
     dependencies {
         implementation(platform("com.fasterxml.jackson:jackson-bom:2.14.2"))
         implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.properties["kotlin.version"]}")
-    }
-
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            suppressWarnings = true
-            jvmTarget = "21"
-        }
     }
 
     val migrateMockData by tasks.creating(MigrateMockData::class) {
