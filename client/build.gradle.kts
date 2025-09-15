@@ -5,8 +5,6 @@ plugins {
     `maven-publish`
 }
 
-val signingRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
-
 publishing {
     repositories {
         maven {
@@ -42,7 +40,7 @@ publishing {
 }
 
 signing {
-    isRequired = signingRequired
+    isRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
