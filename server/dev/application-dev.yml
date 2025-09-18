@@ -13,20 +13,35 @@ auth-server:
   url: # set via EnvFile
   realm: # set via EnvFile
 
+#one-c:
+#  host: # set via EnvFile
+#  username: # set via EnvFile
+#  password: # set via EnvFile
+#
+#jira1:
+#  host: # set via EnvFile
+#  username: # set via EnvFile
+#  password: # set via EnvFile
+#
+#jira2:
+#  host: # set via EnvFile
+#  username: # set via EnvFile
+#  password: # set via EnvFile
+
 one-c:
-  host: # set via EnvFile
-  username: # set via EnvFile
-  password: # set via EnvFile
+  host: http://mockserver:1080/one-c
+  username: oneCUser
+  password: oneCPassword
 
 jira1:
-  host: # set via EnvFile
-  username: # set via EnvFile
-  password: # set via EnvFile
+  host: http://mockserver:1080/jira1
+  username: jiraUser
+  password: jiraPassword
 
 jira2:
-  host: # set via EnvFile
-  username: # set via EnvFile
-  password: # set via EnvFile
+  host: http://mockserver:1080/jira2
+  username: jira2User
+  password: jira2Password
 
 employee-service:
   work-day-hours: 8
@@ -36,3 +51,9 @@ employee-service:
 logging.level:
   org.springframework.security: DEBUG
   org.springframework.web.reactive.function.client: TRACE
+
+octopus-security:
+  roles:
+    ROLE_EMPLOYEE_SERVICE_USER_DEV:
+      - ACCESS_EMPLOYEE
+      - ACCESS_CUSTOMER
