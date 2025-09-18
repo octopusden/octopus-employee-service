@@ -13,35 +13,20 @@ auth-server:
   url: # set via EnvFile
   realm: # set via EnvFile
 
-#one-c:
-#  host: # set via EnvFile
-#  username: # set via EnvFile
-#  password: # set via EnvFile
-#
-#jira1:
-#  host: # set via EnvFile
-#  username: # set via EnvFile
-#  password: # set via EnvFile
-#
-#jira2:
-#  host: # set via EnvFile
-#  username: # set via EnvFile
-#  password: # set via EnvFile
-
 one-c:
-  host: http://mockserver:1080/one-c
-  username: oneCUser
-  password: oneCPassword
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
 
 jira1:
-  host: http://mockserver:1080/jira1
-  username: jiraUser
-  password: jiraPassword
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
 
 jira2:
-  host: http://mockserver:1080/jira2
-  username: jira2User
-  password: jira2Password
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
 
 employee-service:
   work-day-hours: 8
