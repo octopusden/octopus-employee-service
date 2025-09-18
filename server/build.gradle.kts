@@ -96,6 +96,8 @@ dockerCompose {
     waitForTcpPorts = true
     captureContainersOutputToFiles = layout.buildDirectory.dir("docker_logs").get().asFile
     environment.putAll(mapOf("DOCKER_REGISTRY" to dockerRegistry))
+
+    isRequiredBy(tasks["migrateMockData"])
 }
 
 tasks.getByName("composeUp").doFirst {
