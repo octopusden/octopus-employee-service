@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.withType
+import org.octopusden.task.MigrateMockData
+
 buildscript {
     dependencies {
         classpath("com.bmuschko:gradle-docker-plugin:3.6.2")
@@ -96,8 +99,6 @@ dockerCompose {
     waitForTcpPorts = true
     captureContainersOutputToFiles = layout.buildDirectory.dir("docker_logs").get().asFile
     environment.putAll(mapOf("DOCKER_REGISTRY" to dockerRegistry))
-
-    isRequiredBy(tasks["migrateMockData"])
 }
 
 tasks.getByName("composeUp").doFirst {
@@ -129,6 +130,10 @@ tasks.withType<Test> {
     }
 
     environment.putAll(mapOf("AUTH_SERVER_URL" to authServerUrl, "AUTH_SERVER_REALM" to authServerRealm))
+}
+
+tasks.withType<MigrateMockData> {
+    dependsOn("composeUp")
 }
 
 dockerCompose.isRequiredBy(tasks["test"])
