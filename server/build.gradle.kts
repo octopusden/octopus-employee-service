@@ -88,6 +88,14 @@ tasks.getByName("dockerBuildImage").doFirst {
     }
 }
 
+tasks.register<Exec>("dockerPushImageCli") {
+    commandLine("docker", "push", "docker.artifactory.openwaygroup.com/octopusden/employee-service:2.0.37-645")
+}
+
+tasks.named("dockerPushImage") {
+    dependsOn("dockerPushImageCli")
+}
+
 dockerCompose {
     useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
     waitForTcpPorts = true
