@@ -88,13 +88,8 @@ tasks.getByName("dockerBuildImage").doFirst {
     }
 }
 
-tasks.register<Exec>("dockerPushImageCli") {
+tasks.getByName("dockerPushImage") {
     dependsOn("dockerBuildImage")
-    commandLine("docker", "push", "docker.artifactory.openwaygroup.com/octopusden/${project.name}:${project.version}")
-}
-
-tasks.named("dockerPushImage") {
-    dependsOn("dockerPushImageCli")
 }
 
 dockerCompose {
