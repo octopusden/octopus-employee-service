@@ -89,6 +89,7 @@ tasks.getByName("dockerBuildImage").doFirst {
 }
 
 tasks.register<Exec>("dockerPushImageCli") {
+    dependsOn("dockerBuildImage")
     commandLine("docker", "push", "docker.artifactory.openwaygroup.com/octopusden/employee-service:2.0.37-645")
 }
 
