@@ -1,4 +1,5 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
@@ -39,25 +40,27 @@ publishing {
 }
 
 signing {
+    isRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications["maven"])
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 8
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.jvmTarget = "1.8"
+    compilerOptions.freeCompilerArgs.add("-Xjdk-release=1.8")
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-annotations")
-    api(platform("io.github.openfeign:feign-bom:11.9.1"))
+    api(platform("io.github.openfeign:feign-bom:13.2.1"))
     api("io.github.openfeign:feign-httpclient")
     api("io.github.openfeign:feign-jackson")
     api("io.github.openfeign:feign-slf4j")
-    api("org.apache.httpcomponents:httpclient:4.5.13")
+
+    implementation("com.fasterxml.jackson.core:jackson-annotations")
 }

@@ -12,7 +12,6 @@ import org.mockserver.model.HttpResponse
 import java.io.File
 import java.nio.charset.Charset
 
-
 open class MigrateMockData : DefaultTask() {
 
     private val mockServerClient = MockServerClient("localhost", 1080)

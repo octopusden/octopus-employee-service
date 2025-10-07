@@ -1,11 +1,10 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.octopusden.task.MigrateMockData
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
     idea
-    id("org.jetbrains.kotlin.jvm") apply (false)
+    id("org.jetbrains.kotlin.jvm")
     id("io.github.gradle-nexus.publish-plugin")
     signing
 }
@@ -34,9 +33,14 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+        JavaVersion.VERSION_21.let {
+            sourceCompatibility = it
+            targetCompatibility = it
         }
+    }
+
+    kotlin {
+        compilerOptions.jvmTarget = JvmTarget.JVM_21
     }
 
     repositories {
@@ -53,14 +57,8 @@ subprojects {
     }
 
     dependencies {
-        implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.3"))
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    }
-
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            suppressWarnings = true
-            jvmTarget = "1.8"
+        constraints {
+            implementation("org.jetbrains.kotlin:kotlin-stdlib:${project.properties["kotlin.version"]}")
         }
     }
 

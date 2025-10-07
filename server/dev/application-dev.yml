@@ -36,3 +36,9 @@ employee-service:
 logging.level:
   org.springframework.security: DEBUG
   org.springframework.web.reactive.function.client: TRACE
+
+octopus-security:
+  roles:
+    ROLE_EMPLOYEE_SERVICE_USER_DEV:
+      - ACCESS_EMPLOYEE
+      - ACCESS_CUSTOMER

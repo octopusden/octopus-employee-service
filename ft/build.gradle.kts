@@ -1,5 +1,5 @@
 plugins {
-    id("com.avast.gradle.docker-compose") version "0.14.3"
+    id("com.avast.gradle.docker-compose") version "0.16.9"
 }
 
 val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String

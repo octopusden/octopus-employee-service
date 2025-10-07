@@ -1,8 +1,5 @@
-buildscript {
-    dependencies {
-        classpath("com.bmuschko:gradle-docker-plugin:3.6.2")
-    }
-}
+import org.gradle.kotlin.dsl.withType
+import org.octopusden.task.MigrateMockData
 
 plugins {
     id("org.springframework.boot")
@@ -10,9 +7,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.jpa")
     id("org.jetbrains.kotlin.plugin.allopen")
     id("org.jetbrains.kotlin.plugin.noarg")
-    id("com.bmuschko.docker-spring-boot-application") version "6.4.0"
+    id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
     `maven-publish`
-    id("com.avast.gradle.docker-compose") version "0.14.3"
+    id("com.avast.gradle.docker-compose") version "0.16.9"
 }
 
 repositories {
@@ -59,6 +56,7 @@ publishing {
 }
 
 signing {
+    isRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
@@ -72,7 +70,7 @@ springBoot {
 docker {
     springBootApplication {
         baseImage.set("$dockerRegistry/eclipse-temurin:21-jdk")
-        ports.set(listOf(8080, 8080))
+        ports.set(listOf(8080))
         images.set(setOf("$octopusGithubDockerRegistry/octopusden/${project.name}:${project.version}"))
     }
 }
@@ -90,10 +88,14 @@ tasks.getByName("dockerBuildImage").doFirst {
     }
 }
 
+tasks.getByName("dockerPushImage") {
+    dependsOn("dockerBuildImage")
+}
+
 dockerCompose {
     useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
     waitForTcpPorts = true
-    captureContainersOutputToFiles = File("$buildDir${File.separator}/docker_logs")
+    captureContainersOutputToFiles = layout.buildDirectory.dir("docker_logs").get().asFile
     environment.putAll(mapOf("DOCKER_REGISTRY" to dockerRegistry))
 }
 
@@ -128,31 +130,32 @@ tasks.withType<Test> {
     environment.putAll(mapOf("AUTH_SERVER_URL" to authServerUrl, "AUTH_SERVER_REALM" to authServerRealm))
 }
 
+tasks.withType<MigrateMockData> {
+    dependsOn("composeUp")
+}
+
 dockerCompose.isRequiredBy(tasks["test"])
 
 dependencies {
     implementation(project(":common"))
 
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}"))
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${project.properties["spring-boot.version"]}"))
-
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
-    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.9.5")
-
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-aop")
-
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.octopusden.octopus-cloud-commons:octopus-security-common:${project.properties["octopus-cloud-commons.version"]}")
 
-    implementation("org.springdoc:springdoc-openapi-ui:${project.properties["springdoc.version"]}")
-    implementation("org.springdoc:springdoc-openapi-kotlin:${project.properties["springdoc.version"]}")
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}"))
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springdoc.version"]}")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
