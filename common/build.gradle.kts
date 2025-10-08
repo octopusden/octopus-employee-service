@@ -1,4 +1,5 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
