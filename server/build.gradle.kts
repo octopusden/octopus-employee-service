@@ -1,12 +1,6 @@
 import org.gradle.kotlin.dsl.withType
 import org.octopusden.task.MigrateMockData
 
-buildscript {
-    dependencies {
-        classpath("com.bmuschko:gradle-docker-plugin:3.6.2")
-    }
-}
-
 plugins {
     id("org.springframework.boot")
     id("org.jetbrains.kotlin.plugin.spring")
