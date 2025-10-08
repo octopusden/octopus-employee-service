@@ -36,6 +36,8 @@ objects:
               value: "/"
             - name: SPRING_CLOUD_CONFIG_ENABLED
               value: "false"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "ft"
             - name: AUTH_SERVER_URL
               value: ${AUTH_SERVER_URL}
             - name: AUTH_SERVER_REALM
