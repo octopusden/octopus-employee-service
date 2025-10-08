@@ -123,8 +123,8 @@ dependencies {
     ftImplementation("org.junit.jupiter:junit-jupiter-engine:${project.properties["junit-jupiter.version"]}")
     ftImplementation("org.junit.jupiter:junit-jupiter-params:${project.properties["junit-jupiter.version"]}")
     ftImplementation("com.fasterxml.jackson.core:jackson-core")
-    ftImplementation("com.fasterxml.jackson.core:jackson-databind")
-    ftImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    ftImplementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+    ftImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
 
     ftImplementation("ch.qos.logback:logback-core:1.4.1")
     ftImplementation("ch.qos.logback:logback-classic:1.4.1")
