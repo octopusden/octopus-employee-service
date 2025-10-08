@@ -94,6 +94,10 @@ tasks.getByName("dockerBuildImage").doFirst {
     }
 }
 
+tasks.getByName("dockerPushImage") {
+    dependsOn("dockerBuildImage")
+}
+
 dockerCompose {
     useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
     waitForTcpPorts = true
