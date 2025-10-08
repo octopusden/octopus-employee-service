@@ -85,7 +85,7 @@ ocTemplate {
         parameters.set(mapOf(
             "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
             "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "APPLICATION_CONTENT" to layout.projectDirectory.dir("docker/api-gateway.yaml").asFile.readText(),
+            "APPLICATION_FT_CONTENT" to layout.projectDirectory.dir("docker/api-gateway.yaml").asFile.readText(),
             "API_GATEWAY_VERSION" to properties["api-gateway.version"] as String,
             "AUTH_SERVER_URL" to "authServerUrl".getExt(),
             "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
@@ -101,7 +101,7 @@ ocTemplate {
         parameters.set(mapOf(
             "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
             "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "APPLICATION_CONTENT" to layout.projectDirectory.dir("docker/employee-service.yaml").asFile.readText(),
+            "APPLICATION_FT_CONTENT" to layout.projectDirectory.dir("docker/employee-service.yaml").asFile.readText(),
             "EMPLOYEE_SERVICE_VERSION" to project.version as String,
             "AUTH_SERVER_URL" to "authServerUrl".getExt(),
             "AUTH_SERVER_REALM" to "authServerRealm".getExt(),

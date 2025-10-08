@@ -8,8 +8,8 @@ objects:
     metadata:
       name: ${DEPLOYMENT_PREFIX}-gateway-config-data
     data:
-      application.yaml: |-
-        ${APPLICATION_CONTENT}
+      application-ft.yaml: |-
+        ${APPLICATION_FT_CONTENT}
   - apiVersion: v1
     kind: Pod
     metadata:
@@ -50,16 +50,16 @@ objects:
               value: ${TEST_API_GATEWAY_HOST_EXTERNAL}
           volumeMounts:
             - name: application
-              mountPath: /application.yaml
-              subPath: application.yaml
+              mountPath: /application-ft.yaml
+              subPath: application-ft.yaml
               readOnly: true
       volumes:
         - name: application
           configMap:
             name: ${DEPLOYMENT_PREFIX}-gateway-config-data
             items:
-              - key: application.yaml
-                path: application.yaml
+              - key: application-ft.yaml
+                path: application-ft.yaml
   - apiVersion: v1
     kind: Service
     metadata:
@@ -94,8 +94,8 @@ parameters:
   - description: Octopus github docker registry
     name: OCTOPUS_GITHUB_DOCKER_REGISTRY
     required: true
-  - description: application.yaml content
-    name: APPLICATION_CONTENT
+  - description: application-ft.yaml content
+    name: APPLICATION_FT_CONTENT
     required: true
   - description: Auth server URL
     name: AUTH_SERVER_URL

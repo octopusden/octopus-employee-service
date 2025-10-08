@@ -8,8 +8,8 @@ objects:
     metadata:
       name: ${DEPLOYMENT_PREFIX}-employee-config-data
     data:
-      application.yaml: |-
-        ${APPLICATION_CONTENT}
+      application-ft.yaml: |-
+        ${APPLICATION_FT_CONTENT}
   - apiVersion: v1
     kind: Pod
     metadata:
@@ -45,17 +45,17 @@ objects:
             - name: TEST_MOCK_SERVER_HOST
               value: ${TEST_MOCK_SERVER_HOST}
           volumeMounts:
-            - name: application
-              mountPath: /application.yaml
-              subPath: application.yaml
+            - name: application-ft
+              mountPath: /application-ft.yaml
+              subPath: application-ft.yaml
               readOnly: true
       volumes:
-        - name: application
+        - name: application-ft
           configMap:
             name: ${DEPLOYMENT_PREFIX}-employee-config-data
             items:
-              - key: application.yaml
-                path: application.yaml
+              - key: application-ft.yaml
+                path: application-ft.yaml
   - apiVersion: v1
     kind: Service
     metadata:
@@ -90,8 +90,8 @@ parameters:
   - description: Octopus github docker registry
     name: OCTOPUS_GITHUB_DOCKER_REGISTRY
     required: true
-  - description: application.yaml content
-    name: APPLICATION_CONTENT
+  - description: application-ft.yaml content
+    name: APPLICATION_FT_CONTENT
     required: true
   - description: Auth server URL
     name: AUTH_SERVER_URL
