@@ -1,0 +1,54 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: mockserver-template
+objects:
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-mockserver
+      labels:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-mockserver
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: ${{ACTIVE_DEADLINE_SECONDS}}
+      containers:
+        - name: mockserver
+          image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCK_SERVER_VERSION}
+          ports:
+            - containerPort: 1080
+              protocol: TCP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-mockserver-service
+    spec:
+      ports:
+        - port: 1080
+          protocol: TCP
+          targetPort: 1080
+      selector:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-mockserver
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-mockserver-route
+    spec:
+      port:
+        targetPort: 1080
+      to:
+        kind: Service
+        name: ${DEPLOYMENT_PREFIX}-mockserver-service
+parameters:
+  - description: Unique deployment prefix
+    name: DEPLOYMENT_PREFIX
+    required: true
+  - description: Active deadline seconds
+    name: ACTIVE_DEADLINE_SECONDS
+    required: true
+  - description: Docker registry
+    name: DOCKER_REGISTRY
+    required: true
+  - description: Mockserver version
+    name: MOCK_SERVER_VERSION
+    required: true

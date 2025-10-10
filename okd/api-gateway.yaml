@@ -1,0 +1,119 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: api-gateway-template
+objects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-gateway-config-data
+    data:
+      application-ft.yaml: |-
+        ${APPLICATION_FT_CONTENT}
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-gateway
+      labels:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-gateway
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: ${{ACTIVE_DEADLINE_SECONDS}}
+      containers:
+        - name: gateway
+          image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/api-gateway:${API_GATEWAY_VERSION}
+          ports:
+            - containerPort: 8765
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8765
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          env:
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: "/"
+            - name: SPRING_CLOUD_CONFIG_ENABLED
+              value: "false"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "ft"
+            - name: AUTH_SERVER_URL
+              value: ${AUTH_SERVER_URL}
+            - name: AUTH_SERVER_REALM
+              value: ${AUTH_SERVER_REALM}
+            - name: AUTH_SERVER_CLIENT_ID
+              value: ${AUTH_SERVER_CLIENT_ID}
+            - name: AUTH_SERVER_CLIENT_SECRET
+              value: ${AUTH_SERVER_CLIENT_SECRET}
+            - name: TEST_EMPLOYEE_SERVICE_HOST
+              value: ${TEST_EMPLOYEE_SERVICE_HOST}
+            - name: TEST_API_GATEWAY_HOST_EXTERNAL
+              value: ${TEST_API_GATEWAY_HOST_EXTERNAL}
+          volumeMounts:
+            - name: application
+              mountPath: /application-ft.yaml
+              subPath: application-ft.yaml
+              readOnly: true
+      volumes:
+        - name: application
+          configMap:
+            name: ${DEPLOYMENT_PREFIX}-gateway-config-data
+            items:
+              - key: application-ft.yaml
+                path: application-ft.yaml
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-gateway-service
+    spec:
+      ports:
+        - port: 8765
+          protocol: TCP
+          targetPort: 8765
+      selector:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-gateway
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-gateway-route
+    spec:
+      port:
+        targetPort: 8765
+      to:
+        kind: Service
+        name: ${DEPLOYMENT_PREFIX}-gateway-service
+parameters:
+  - description: Unique deployment prefix
+    name: DEPLOYMENT_PREFIX
+    required: true
+  - description: Active deadline seconds
+    name: ACTIVE_DEADLINE_SECONDS
+    required: true
+  - description: API gateway service version
+    name: API_GATEWAY_VERSION
+    required: true
+  - description: Octopus github docker registry
+    name: OCTOPUS_GITHUB_DOCKER_REGISTRY
+    required: true
+  - description: application-ft.yaml content
+    name: APPLICATION_FT_CONTENT
+    required: true
+  - description: Auth server URL
+    name: AUTH_SERVER_URL
+    required: true
+  - description: Auth server realm
+    name: AUTH_SERVER_REALM
+    required: true
+  - description: Auth server client ID
+    name: AUTH_SERVER_CLIENT_ID
+    required: true
+  - description: Auth server secret
+    name: AUTH_SERVER_CLIENT_SECRET
+    required: true
+  - description: Test employee service host
+    name: TEST_EMPLOYEE_SERVICE_HOST
+    required: true
+  - description: Test api gateway service host
+    name: TEST_API_GATEWAY_HOST_EXTERNAL
+    required: true

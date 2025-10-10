@@ -22,7 +22,7 @@ management:
 
 auth-server:
   url: # set via env
-  logout-url: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/logout?redirect_uri=http://localhost:8765/employee-service/swagger-ui/index.html
+  logout-url: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/logout?redirect_uri=http://${TEST_API_GATEWAY_HOST}/employee-service/swagger-ui/index.html
   realm: # set via env
 
 employee-service:
@@ -31,17 +31,17 @@ employee-service:
     jql: Employee in ({usernames}) AND project in ("Calendar RCIS", "Calendar") AND "Leave from date" <= startOfDay() AND "Leave to date" >= endOfDay() AND status not in (Canceled, Rejected)
 
 one-c:
-  host: http://mockserver:1080/one-c
+  host: http://${TEST_MOCK_SERVER_HOST}/one-c
   username: oneCUser
   password: oneCPassword
 
 jira1:
-  host: http://mockserver:1080/jira1
+  host: http://${TEST_MOCK_SERVER_HOST}/jira1
   username: jiraUser
   password: jiraPassword
 
 jira2:
-  host: http://mockserver:1080/jira2
+  host: http://${TEST_MOCK_SERVER_HOST}/jira2
   username: jira2User
   password: jira2Password
 

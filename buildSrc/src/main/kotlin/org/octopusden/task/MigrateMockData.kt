@@ -4,6 +4,7 @@ import com.google.common.io.Files
 import com.google.common.net.HttpHeaders
 import org.apache.http.entity.ContentType
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.mockserver.client.MockServerClient
@@ -12,21 +13,24 @@ import org.mockserver.model.HttpResponse
 import java.io.File
 import java.nio.charset.Charset
 
-open class MigrateMockData : DefaultTask() {
-
-    private val mockServerClient = MockServerClient("localhost", 1080)
-
+abstract class MigrateMockData : DefaultTask() {
     @get:Input
-    lateinit var testDataDir: String
+    abstract val host: Property<String>
+    @get:Input
+    abstract val port: Property<Int>
+    @get:Input
+    abstract val testDataDir: Property<String>
+
+    private val mockServerClient get() = MockServerClient(host.get(), port.get())
 
     @TaskAction
     fun startMockServer() {
         mockServerClient.reset()
         endpointToResponseFileName.forEach {
-            generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, 200)
+            generateMockserverData(it.key.first, it.key.second, testDataDir.get() + File.separator + it.value, 200)
         }
         endpointNotFoundToResponseFileName.forEach {
-            generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, 404)
+            generateMockserverData(it.key.first, it.key.second, testDataDir.get() + File.separator + it.value, 404)
         }
     }
 

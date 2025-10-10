@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.jpa")
     id("org.jetbrains.kotlin.plugin.allopen")
     id("org.jetbrains.kotlin.plugin.noarg")
+    id("org.octopusden.octopus.oc-template")
     id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
     `maven-publish`
     id("com.avast.gradle.docker-compose") version "0.16.9"
@@ -16,10 +17,7 @@ repositories {
     mavenCentral()
 }
 
-val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String
-val octopusGithubDockerRegistry = System.getenv().getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]) as? String
-val authServerUrl = System.getenv().getOrDefault("AUTH_SERVER_URL", project.properties["auth-server.url"]) as? String
-val authServerRealm = System.getenv().getOrDefault("AUTH_SERVER_REALM", project.properties["auth-server.realm"]) as? String
+fun String.getExt() = project.ext[this] as String
 
 tasks.getByName<Jar>("jar") {
     enabled = false
@@ -56,11 +54,15 @@ publishing {
 }
 
 signing {
-    isRequired = System.getenv().containsKey("ORG_GRADLE_PROJECT_signingKey") && System.getenv().containsKey("ORG_GRADLE_PROJECT_signingPassword")
+    isRequired = project.ext["signingRequired"] as Boolean
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications["bootJar"])
+}
+
+tasks {
+    val migrateMockData by registering(MigrateMockData::class)
 }
 
 springBoot {
@@ -69,22 +71,9 @@ springBoot {
 
 docker {
     springBootApplication {
-        baseImage.set("$dockerRegistry/eclipse-temurin:21-jdk")
+        baseImage.set("${"dockerRegistry".getExt()}/eclipse-temurin:21-jdk")
         ports.set(listOf(8080))
-        images.set(setOf("$octopusGithubDockerRegistry/octopusden/${project.name}:${project.version}"))
-    }
-}
-
-tasks.getByName("dockerBuildImage").doFirst {
-    if (dockerRegistry.isNullOrBlank() || octopusGithubDockerRegistry.isNullOrBlank()) {
-        throw IllegalArgumentException(
-            "Start gradle build with" +
-                    (if (dockerRegistry.isNullOrBlank()) " -Pdocker.registry=..." else "") +
-                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " -Poctopus.github.docker.registry=..." else "") +
-                    " or set env variable(s):" +
-                    (if (dockerRegistry.isNullOrBlank()) " DOCKER_REGISTRY" else "") +
-                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " OCTOPUS_GITHUB_DOCKER_REGISTRY" else "")
-        )
+        images.set(setOf("${"octopusGithubDockerRegistry".getExt()}/octopusden/${project.name}:${project.version}"))
     }
 }
 
@@ -95,13 +84,10 @@ tasks.getByName("dockerPushImage") {
 dockerCompose {
     useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
     waitForTcpPorts = true
-    captureContainersOutputToFiles = layout.buildDirectory.dir("docker_logs").get().asFile
-    environment.putAll(mapOf("DOCKER_REGISTRY" to dockerRegistry))
+    captureContainersOutputToFiles = layout.buildDirectory.dir("docker-logs").get().asFile
+    environment.putAll(mapOf("DOCKER_REGISTRY" to "dockerRegistry".getExt(), "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String))
 }
 
-tasks.getByName("composeUp").doFirst {
-    if (dockerRegistry.isNullOrBlank()) throw IllegalArgumentException("Start gradle build with -Pdocker.registry=... or set env variable(s): DOCKER_REGISTRY")
-}
 
 sourceSets {
     test {
@@ -111,30 +97,57 @@ sourceSets {
     }
 }
 
-tasks.withType<Test> {
-    dependsOn("migrateMockData")
+ocTemplate {
+    workDir.set(layout.buildDirectory.dir("okd"))
+    clusterDomain.set("okdClusterDomain".getExt())
+    namespace.set("okdProject".getExt())
+    prefix.set("employee-ut")
 
-    doFirst {
-        if (authServerUrl.isNullOrBlank() || authServerRealm.isNullOrBlank()) {
-            throw IllegalArgumentException(
-                "Start gradle build with" +
-                        (if (authServerUrl.isNullOrBlank()) " -Pauth-server.url=..." else "") +
-                        (if (authServerRealm.isNullOrBlank()) " -Pauth-server.realm=..." else "") +
-                        " or set env variable(s):" +
-                        (if (authServerUrl.isNullOrBlank()) " AUTH_SERVER_URL" else "") +
-                        (if (authServerRealm.isNullOrBlank()) " AUTH_SERVER_REALM" else "")
-            )
-        }
+    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let{
+        webConsoleUrl.set(it)
     }
 
-    environment.putAll(mapOf("AUTH_SERVER_URL" to authServerUrl, "AUTH_SERVER_REALM" to authServerRealm))
+    service("mockserver") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
+        parameters.set(mapOf(
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
+        ))
+    }
 }
 
-tasks.withType<MigrateMockData> {
-    dependsOn("composeUp")
+tasks.named<MigrateMockData>("migrateMockData") {
+    testDataDir.set(rootDir.toString() + File.separator + "test-data")
+    when ("testPlatform".getExt()) {
+        "okd" -> {
+            host.set(ocTemplate.getOkdHost("mockserver"))
+            port.set(80)
+            dependsOn("ocCreate")
+        }
+        "docker" -> {
+            host.set("localhost")
+            port.set(1080)
+            dependsOn("composeUp")
+        }
+    }
 }
 
-dockerCompose.isRequiredBy(tasks["test"])
+tasks.withType<Test> {
+    when ("testPlatform".getExt()) {
+        "okd" -> {
+            systemProperties["test.mockserver-host"] = ocTemplate.getOkdHost("mockserver")
+            dependsOn("migrateMockData")
+            ocTemplate.isRequiredBy(this)
+        }
+        "docker" -> {
+            systemProperties["test.mockserver-host"] = "localhost:1080"
+            dependsOn("migrateMockData")
+            dockerCompose.isRequiredBy(this)
+        }
+    }
+    environment.putAll(mapOf("AUTH_SERVER_URL" to "authServerUrl".getExt(), "AUTH_SERVER_REALM" to "authServerRealm".getExt()))
+}
 
 dependencies {
     implementation(project(":common"))

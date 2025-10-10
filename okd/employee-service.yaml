@@ -1,0 +1,109 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: employee-service-template
+objects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-employee-config-data
+    data:
+      application-ft.yaml: |-
+        ${APPLICATION_FT_CONTENT}
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-employee
+      labels:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-employee
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: ${{ACTIVE_DEADLINE_SECONDS}}
+      containers:
+        - name: employee
+          image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/employee-service:${EMPLOYEE_SERVICE_VERSION}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          env:
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: "/"
+            - name: SPRING_CLOUD_CONFIG_ENABLED
+              value: "false"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "ft"
+            - name: AUTH_SERVER_URL
+              value: ${AUTH_SERVER_URL}
+            - name: AUTH_SERVER_REALM
+              value: ${AUTH_SERVER_REALM}
+            - name: TEST_API_GATEWAY_HOST
+              value: ${TEST_API_GATEWAY_HOST}
+            - name: TEST_MOCK_SERVER_HOST
+              value: ${TEST_MOCK_SERVER_HOST}
+          volumeMounts:
+            - name: application-ft
+              mountPath: /application-ft.yaml
+              subPath: application-ft.yaml
+              readOnly: true
+      volumes:
+        - name: application-ft
+          configMap:
+            name: ${DEPLOYMENT_PREFIX}-employee-config-data
+            items:
+              - key: application-ft.yaml
+                path: application-ft.yaml
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-employee-service
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-employee
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-employee-route
+    spec:
+      port:
+        targetPort: 8080
+      to:
+        kind: Service
+        name: ${DEPLOYMENT_PREFIX}-employee-service
+parameters:
+  - description: Unique deployment prefix
+    name: DEPLOYMENT_PREFIX
+    required: true
+  - description: Active deadline seconds
+    name: ACTIVE_DEADLINE_SECONDS
+    required: true
+  - description: Employee service version
+    name: EMPLOYEE_SERVICE_VERSION
+    required: true
+  - description: Octopus github docker registry
+    name: OCTOPUS_GITHUB_DOCKER_REGISTRY
+    required: true
+  - description: application-ft.yaml content
+    name: APPLICATION_FT_CONTENT
+    required: true
+  - description: Auth server URL
+    name: AUTH_SERVER_URL
+    required: true
+  - description: Auth server realm
+    name: AUTH_SERVER_REALM
+    required: true
+  - description: API gateway host
+    name: TEST_API_GATEWAY_HOST
+    required: true
+  - description: Mockserver host
+    name: TEST_MOCK_SERVER_HOST
+    required: true
