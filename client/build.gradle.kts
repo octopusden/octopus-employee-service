@@ -58,6 +58,6 @@ tasks.withType<KotlinCompile>().configureEach {
 
 dependencies {
     api(project(":common"))
-    api("com.fasterxml.jackson.module:jackson-module-kotlin")
-    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:${project.properties["jackson.version"]}")
+    api("com.fasterxml.jackson.core:jackson-databind:${project.properties["jackson.version"]}")
 }

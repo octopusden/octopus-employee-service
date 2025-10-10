@@ -57,10 +57,9 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 dependencies {
-    api(platform("io.github.openfeign:feign-bom:13.2.1"))
-    api("io.github.openfeign:feign-httpclient")
-    api("io.github.openfeign:feign-jackson")
-    api("io.github.openfeign:feign-slf4j")
+    api("io.github.openfeign:feign-httpclient:${project.properties["openfeign.version"]}")
+    api("io.github.openfeign:feign-jackson:${project.properties["openfeign.version"]}")
+    api("io.github.openfeign:feign-slf4j:${project.properties["openfeign.version"]}")
 
-    implementation("com.fasterxml.jackson.core:jackson-annotations")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${project.properties["jackson.version"]}")
 }
