@@ -3,6 +3,6 @@ version: '3'
 services:
   mockserver:
     container_name: ut-mockserver
-    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.11.1
+    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCK_SERVER_VERSION}
     ports:
       - "1080:1080"

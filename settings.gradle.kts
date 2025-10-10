@@ -10,6 +10,7 @@ pluginManagement {
         id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
         id("org.springframework.boot") version springBootVersion
         id("io.github.gradle-nexus.publish-plugin") version ("1.1.0") apply (false)
+        id("org.octopusden.octopus.oc-template") version (extra["octopus-oc-template.version"] as String)
     }
     repositories {
         gradlePluginPortal()

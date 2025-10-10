@@ -9,7 +9,7 @@ spring:
         - TokenRelay
       routes:
         - id: employee-service
-          uri: http://employee-service:8080
+          uri: http://${TEST_EMPLOYEE_SERVICE_HOST}
           predicates:
             - Path=/employee-service/**
           filters:
@@ -45,7 +45,7 @@ management:
 
 auth-server:
   url: # set via env
-  logout-url: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/logout?redirect_uri=http://localhost:8765
+  logout-url: ${auth-server.url}/realms/${auth-server.realm}/protocol/openid-connect/logout?redirect_uri=${TEST_API_GATEWAY_HOST_EXTERNAL}
   realm: # set via env
   client-id: # set via env
   client-secret: # set via env

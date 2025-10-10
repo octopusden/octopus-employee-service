@@ -1,55 +1,45 @@
+import org.gradle.kotlin.dsl.provideDelegate
+import org.octopusden.task.MigrateMockData
+
 plugins {
+    id("org.octopusden.octopus.oc-template")
     id("com.avast.gradle.docker-compose") version "0.16.9"
 }
 
-val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String
-val octopusGithubDockerRegistry = System.getenv().getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]) as? String
-val authServerUrl = System.getenv().getOrDefault("AUTH_SERVER_URL", project.properties["auth-server.url"]) as? String
-val authServerRealm = System.getenv().getOrDefault("AUTH_SERVER_REALM", project.properties["auth-server.realm"]) as? String
-val authServerClientId = System.getenv().getOrDefault("AUTH_SERVER_CLIENT_ID", project.properties["auth-server.client-id"]) as? String
-val authServerClientSecret = System.getenv().getOrDefault("AUTH_SERVER_CLIENT_SECRET", project.properties["auth-server.client-secret"]) as? String
-val employeeServiceUser = System.getenv().getOrDefault("EMPLOYEE_SERVICE_USER", project.properties["employee-service.user"]) as? String
-val employeeServicePassword = System.getenv().getOrDefault("EMPLOYEE_SERVICE_PASSWORD", project.properties["employee-service.password"]) as? String
+fun String.getPort() = when (this) {
+    "gateway" -> 8765
+    "employee" -> 8080
+    "mockserver" -> 1080
+    else -> throw Exception("Unknown service '$this'")
+}
+fun getOkdExternalHost(serviceName: String) = "${ocTemplate.getPod(serviceName)}-service:${serviceName.getPort()}"
+fun String.getExt() = project.ext[this] as String
 
 dockerCompose {
     useComposeFiles.add("${projectDir}${File.separator}docker${File.separator}docker-compose.yml")
     waitForTcpPorts = true
-    captureContainersOutputToFiles = File("$buildDir${File.separator}docker_logs")
+    captureContainersOutputToFiles = layout.buildDirectory.file("docker-logs").get().asFile
     environment.putAll(
         mapOf(
-            "APP_VERSION" to project.version,
-            "DOCKER_REGISTRY" to dockerRegistry,
-            "OCTOPUS_GITHUB_DOCKER_REGISTRY" to octopusGithubDockerRegistry,
-            "AUTH_SERVER_URL" to authServerUrl,
-            "AUTH_SERVER_REALM" to authServerRealm,
-            "AUTH_SERVER_CLIENT_ID" to authServerClientId,
-            "AUTH_SERVER_CLIENT_SECRET" to authServerClientSecret
+            "EMPLOYEE_SERVICE_VERSION" to project.version,
+            "API_GATEWAY_VERSION" to project.properties["api-gateway.version"] as String,
+            "MOCK_SERVER_VERSION" to project.properties["mockserver.version"] as String,
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
+            "AUTH_SERVER_URL" to "authServerUrl".getExt(),
+            "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
+            "AUTH_SERVER_CLIENT_ID" to "authServerClientId".getExt(),
+            "AUTH_SERVER_CLIENT_SECRET" to "authServerClientSecret".getExt(),
+            "TEST_API_GATEWAY_HOST" to "api-gateway:8765",
+            "TEST_API_GATEWAY_HOST_EXTERNAL" to "localhost:8765",
+            "TEST_MOCK_SERVER_HOST" to "mockserver:1080",
+            "TEST_EMPLOYEE_SERVICE_HOST" to "employee-service:8080"
         )
     )
 }
 
-tasks.getByName("composeUp").doFirst {
-    if (dockerRegistry.isNullOrBlank() || octopusGithubDockerRegistry.isNullOrBlank() ||
-        authServerUrl.isNullOrBlank() || authServerRealm.isNullOrBlank() ||
-        authServerClientId.isNullOrBlank() || authServerClientSecret.isNullOrBlank()
-    ) {
-        throw IllegalArgumentException(
-            "Start gradle build with" +
-                    (if (dockerRegistry.isNullOrBlank()) " -Pdocker.registry=..." else "") +
-                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " -Poctopus.github.docker.registry=..." else "") +
-                    (if (authServerUrl.isNullOrBlank()) " -Pauth-server.url=..." else "") +
-                    (if (authServerRealm.isNullOrBlank()) " -Pauth-server.realm=..." else "") +
-                    (if (authServerClientId.isNullOrBlank()) " -Pauth-server.client-id=..." else "") +
-                    (if (authServerClientSecret.isNullOrBlank()) " -Pauth-server.client-secret=..." else "") +
-                    " or set env variable(s):" +
-                    (if (dockerRegistry.isNullOrBlank()) " DOCKER_REGISTRY" else "") +
-                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " OCTOPUS_GITHUB_DOCKER_REGISTRY" else "") +
-                    (if (authServerUrl.isNullOrBlank()) " AUTH_SERVER_URL" else "") +
-                    (if (authServerRealm.isNullOrBlank()) " AUTH_SERVER_REALM" else "") +
-                    (if (authServerClientId.isNullOrBlank()) " AUTH_SERVER_CLIENT_ID" else "") +
-                    (if (authServerClientSecret.isNullOrBlank()) " AUTH_SERVER_CLIENT_SECRET" else "")
-        )
-    }
+tasks {
+    val migrateMockData by registering(MigrateMockData::class)
 }
 
 sourceSets {
@@ -67,49 +57,108 @@ ftImplementation.isCanBeResolved = true
 
 configurations["ftRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
-val ft by tasks.creating(Test::class) {
-    doFirst {
-        if (employeeServiceUser.isNullOrBlank() || employeeServicePassword.isNullOrBlank()) {
-            throw IllegalArgumentException(
-                "Start gradle build with" +
-                        (if (employeeServiceUser.isNullOrBlank()) " -Pemployee-service.user=..." else "") +
-                        (if (employeeServicePassword.isNullOrBlank()) " -Pemployee-service.password=..." else "") +
-                        " or set env variable(s):" +
-                        (if (employeeServiceUser.isNullOrBlank()) " EMPLOYEE_SERVICE_USER" else "") +
-                        (if (employeeServicePassword.isNullOrBlank()) " EMPLOYEE_SERVICE_PASSWORD" else "")
-            )
-        }
-    }
-
-    systemProperties.putAll(
-        mapOf(
-            "buildVersion" to project.version,
-            "employee-service.user" to employeeServiceUser,
-            "employee-service.password" to employeeServicePassword
-        )
-    )
-    group = "verification"
-    description = "Runs the integration tests"
-    testClassesDirs = sourceSets["ft"].output.classesDirs
-    classpath = sourceSets["ft"].runtimeClasspath
+repositories {
+    mavenCentral()
 }
 
-dockerCompose.isRequiredBy(ft)
+ocTemplate {
+    workDir.set(layout.buildDirectory.dir("okd"))
+    clusterDomain.set("okdClusterDomain".getExt())
+    namespace.set("okdProject".getExt())
+    prefix.set("employee-ft")
+
+    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let{
+        webConsoleUrl.set(it)
+    }
+
+    service("mockserver") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
+        parameters.set(mapOf(
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
+        ))
+    }
+
+    service("gateway") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/api-gateway.yaml"))
+        parameters.set(mapOf(
+            "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
+            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+            "APPLICATION_FT_CONTENT" to layout.projectDirectory.dir("docker/api-gateway.yaml").asFile.readText(),
+            "API_GATEWAY_VERSION" to properties["api-gateway.version"] as String,
+            "AUTH_SERVER_URL" to "authServerUrl".getExt(),
+            "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
+            "AUTH_SERVER_CLIENT_ID" to "authServerClientId".getExt(),
+            "AUTH_SERVER_CLIENT_SECRET" to "authServerClientSecret".getExt(),
+            "TEST_EMPLOYEE_SERVICE_HOST" to getOkdExternalHost("employee"),
+            "TEST_API_GATEWAY_HOST_EXTERNAL" to getOkdExternalHost("gateway")
+        ))
+    }
+
+    service("employee") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/employee-service.yaml"))
+        parameters.set(mapOf(
+            "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
+            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+            "APPLICATION_FT_CONTENT" to layout.projectDirectory.dir("docker/employee-service.yaml").asFile.readText(),
+            "EMPLOYEE_SERVICE_VERSION" to project.version as String,
+            "AUTH_SERVER_URL" to "authServerUrl".getExt(),
+            "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
+            "TEST_API_GATEWAY_HOST" to getOkdExternalHost("gateway"),
+            "TEST_MOCK_SERVER_HOST" to getOkdExternalHost("mockserver")
+        ))
+    }
+}
+
+tasks.named<MigrateMockData>("migrateMockData") {
+    testDataDir.set(rootDir.toString() + File.separator + "test-data")
+    when ("testPlatform".getExt()) {
+        "okd" -> {
+            host.set(ocTemplate.getOkdHost("mockserver"))
+            port.set(80)
+            dependsOn("ocCreate")
+        }
+        "docker" -> {
+            host.set("localhost")
+            port.set(1080)
+            dependsOn("composeUp")
+        }
+    }
+}
 
 tasks.named("composeUp") {
     dependsOn(":employee-service:dockerBuildImage")
 }
 
-tasks.named("migrateMockData") {
-    dependsOn("composeUp")
+tasks.named("ocCreate") {
+    dependsOn(":employee-service:dockerPushImage")
 }
 
-tasks.named("ft") {
-    dependsOn("migrateMockData")
-}
-
-repositories {
-    mavenCentral()
+val ft by tasks.creating(Test::class) {
+    group = "verification"
+    description = "Runs the integration tests"
+    testClassesDirs = sourceSets["ft"].output.classesDirs
+    classpath = sourceSets["ft"].runtimeClasspath
+    when ("testPlatform".getExt()) {
+        "okd" -> {
+            systemProperties["test.api-gateway-host"] = ocTemplate.getOkdHost("gateway")
+            dependsOn("migrateMockData")
+            ocTemplate.isRequiredBy(this)
+        }
+        "docker" -> {
+            systemProperties["test.api-gateway-host"] = "localhost:8765"
+            dependsOn("migrateMockData")
+            dockerCompose.isRequiredBy(this)
+        }
+    }
+    systemProperties.putAll(
+        mapOf(
+            "buildVersion" to project.version,
+            "employee-service.user" to "employeeServiceUser".getExt(),
+            "employee-service.password" to "employeeServicePassword".getExt()
+        )
+    )
 }
 
 idea.module {

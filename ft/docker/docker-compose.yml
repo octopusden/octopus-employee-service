@@ -3,7 +3,7 @@ version: '3'
 services:
   employee-service:
     container_name: ft-employee-service
-    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/employee-service:${APP_VERSION}
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/employee-service:${EMPLOYEE_SERVICE_VERSION}
     ports:
       - "8080:8080"
     environment:
@@ -11,12 +11,14 @@ services:
       - AUTH_SERVER_URL=${AUTH_SERVER_URL}
       - AUTH_SERVER_REALM=${AUTH_SERVER_REALM}
       - SPRING_CONFIG_ADDITIONAL_LOCATION=/
+      - TEST_API_GATEWAY_HOST=${TEST_API_GATEWAY_HOST}
+      - TEST_MOCK_SERVER_HOST=${TEST_MOCK_SERVER_HOST}
     volumes:
       - ./employee-service.yaml:/application.yaml
 
   api-gateway:
     container_name: ft-api-gateway
-    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/api-gateway:2.0.1
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/api-gateway:${API_GATEWAY_VERSION}
     ports:
       - "8765:8765"
     volumes:
@@ -28,6 +30,8 @@ services:
       - AUTH_SERVER_CLIENT_ID=${AUTH_SERVER_CLIENT_ID}
       - AUTH_SERVER_CLIENT_SECRET=${AUTH_SERVER_CLIENT_SECRET}
       - SPRING_CONFIG_ADDITIONAL_LOCATION=/
+      - TEST_EMPLOYEE_SERVICE_HOST=${TEST_EMPLOYEE_SERVICE_HOST}
+      - TEST_API_GATEWAY_HOST_EXTERNAL=${TEST_API_GATEWAY_HOST_EXTERNAL}
     depends_on:
       - employee-service
     healthcheck:
@@ -39,6 +43,6 @@ services:
 
   mockserver:
     container_name: ft-mockserver
-    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.11.1
+    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCK_SERVER_VERSION}
     ports:
       - "1080:1080"

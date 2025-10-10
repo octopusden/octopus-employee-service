@@ -14,17 +14,17 @@ auth-server:
   realm: # set via env
 
 one-c:
-  host: http://localhost:1080/one-c
+  host: http://${test.mockserver-host}/one-c
   username: oneCUser
   password: oneCPassword
 
 jira1:
-  host: http://localhost:1080/jira1
+  host: http://${test.mockserver-host}/jira1
   username: jiraUser
   password: jiraPassword
 
 jira2:
-  host: http://localhost:1080/jira2
+  host: http://${test.mockserver-host}/jira2
   username: jira2User
   password: jira2Password
 
