@@ -8,8 +8,8 @@ objects:
     metadata:
       name: ${DEPLOYMENT_PREFIX}-gateway-config-data
     data:
-      application-ft.yaml: |-
-        ${APPLICATION_FT_CONTENT}
+      application-dev.yaml: |-
+        ${APPLICATION_DEV_CONTENT}
   - apiVersion: v1
     kind: Pod
     metadata:
@@ -37,7 +37,7 @@ objects:
             - name: SPRING_CLOUD_CONFIG_ENABLED
               value: "false"
             - name: SPRING_PROFILES_ACTIVE
-              value: "ft"
+              value: "dev"
             - name: AUTH_SERVER_URL
               value: ${AUTH_SERVER_URL}
             - name: AUTH_SERVER_REALM
@@ -51,17 +51,17 @@ objects:
             - name: TEST_API_GATEWAY_HOST_EXTERNAL
               value: ${TEST_API_GATEWAY_HOST_EXTERNAL}
           volumeMounts:
-            - name: application
-              mountPath: /application-ft.yaml
-              subPath: application-ft.yaml
+            - name: application-dev
+              mountPath: /application-dev.yaml
+              subPath: application-dev.yaml
               readOnly: true
       volumes:
-        - name: application
+        - name: application-dev
           configMap:
             name: ${DEPLOYMENT_PREFIX}-gateway-config-data
             items:
-              - key: application-ft.yaml
-                path: application-ft.yaml
+              - key: application-dev.yaml
+                path: application-dev.yaml
   - apiVersion: v1
     kind: Service
     metadata:
@@ -96,8 +96,8 @@ parameters:
   - description: Octopus github docker registry
     name: OCTOPUS_GITHUB_DOCKER_REGISTRY
     required: true
-  - description: application-ft.yaml content
-    name: APPLICATION_FT_CONTENT
+  - description: application-dev.yaml content
+    name: APPLICATION_DEV_CONTENT
     required: true
   - description: Auth server URL
     name: AUTH_SERVER_URL
