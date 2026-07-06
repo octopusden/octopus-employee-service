@@ -7,4 +7,5 @@ interface EmployeeServiceClientParametersProvider {
     fun getBasicCredentials(): String?
     fun getConnectTimeoutMillis(): Int = 300_000
     fun getReadTimeoutMillis(): Int = 300_000
+    fun getConnectionTtlMillis(): Int = -1
 }
