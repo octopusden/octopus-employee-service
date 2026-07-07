@@ -6,6 +6,7 @@ import feign.RequestLine
 import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.octopusden.employee.client.common.dto.Employee
 import org.octopusden.employee.client.common.dto.Health
+import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.ServerInfo
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
@@ -46,6 +47,10 @@ interface EmployeeServiceClient {
         @Param("fromDate", expander = LocalDateExpander::class) fromDate: LocalDate,
         @Param("toDate", expander = LocalDateExpander::class) toDate: LocalDate
     ): WorkingDaysDTO
+
+    @Throws(NotFoundException::class)
+    @RequestLine("GET employee/{employee}/manager")
+    fun getManager(@Param("employee") employee: String): ManagerDTO
 
     @RequestLine("GET actuator/health/oneC")
     fun oneCHealth(): Health

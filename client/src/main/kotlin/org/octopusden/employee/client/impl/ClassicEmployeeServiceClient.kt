@@ -8,6 +8,7 @@ import org.octopusden.employee.client.EmployeeServiceErrorDecoder
 import org.octopusden.employee.client.EmployeeServiceRetry
 import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.ServerInfo
 import feign.Feign
@@ -57,6 +58,8 @@ class ClassicEmployeeServiceClient(
     fun updateApiParameters(apiParametersProvider: EmployeeServiceClientParametersProvider) {
         client = createClient(apiParametersProvider, mapper)
     }
+
+    override fun getManager(employee: String): ManagerDTO = client.getManager(employee)
 
     override fun oneCHealth(): Health = client.oneCHealth()
 

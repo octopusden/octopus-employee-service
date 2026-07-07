@@ -2,10 +2,12 @@ package org.octopusden.employee.service.impl
 
 import org.apache.http.HttpStatus
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.config.EmployeeServiceProperties
+import org.octopusden.employee.service.AdService
 import org.octopusden.employee.service.EmployeeService
 import org.octopusden.employee.service.OneCService
 import org.octopusden.employee.service.formatJQL
@@ -15,6 +17,7 @@ import org.octopusden.employee.service.jira.client.jira1.Jira1Client
 import org.octopusden.employee.service.jira.client.jira2.Jira2Client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -23,7 +26,8 @@ class EmployeeServiceImpl(
     private val oneCService: OneCService,
     private val jira1Client: Jira1Client,
     private val jira2Client: Jira2Client,
-    private val employeeServiceProperties: EmployeeServiceProperties
+    private val employeeServiceProperties: EmployeeServiceProperties,
+    private val adService: ObjectProvider<AdService>,
 ) :
     EmployeeService {
 
@@ -82,6 +86,12 @@ class EmployeeServiceImpl(
     override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
         return oneCService.getWorkingDays(fromDate, toDate)
             .also { workingDaysDTO -> log.debug("getWorkingDays($fromDate,$toDate)=$workingDaysDTO") }
+    }
+
+    override fun getManager(username: String): ManagerDTO {
+        log.debug("getManager({})", username)
+        val svc = adService.getIfAvailable() ?: return ManagerDTO(null)
+        return ManagerDTO(svc.getManager(username))
     }
 
     data class UserAbsence(val employee: JiraUser, val start: LocalDate, val end: LocalDate)

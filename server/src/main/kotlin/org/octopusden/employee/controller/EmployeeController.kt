@@ -1,6 +1,7 @@
 package org.octopusden.employee.controller
 
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.service.EmployeeService
 import org.springframework.security.access.annotation.Secured
@@ -34,4 +35,8 @@ class EmployeeController(
     @GetMapping("{username}/available")
     @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")
     fun isEmployeeAvailable(@PathVariable("username") username: String): Boolean = employeeService.isUserAvailable(username)
+
+    @GetMapping("{username}/manager")
+    @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")
+    fun getManager(@PathVariable("username") username: String): ManagerDTO = employeeService.getManager(username)
 }
