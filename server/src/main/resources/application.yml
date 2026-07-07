@@ -1,9 +1,4 @@
 spring.mvc.pathmatch.matching-strategy: ant_path_matcher
-spring:
-  cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=1000,expireAfterWrite=300s
 management:
   endpoint:
     health:
