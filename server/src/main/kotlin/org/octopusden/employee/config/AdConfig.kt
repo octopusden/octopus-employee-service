@@ -1,6 +1,7 @@
 package org.octopusden.employee.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import org.octopusden.employee.service.impl.AdServiceImpl
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.CacheManager
@@ -39,7 +40,7 @@ class AdConfig(private val adProperties: AdProperties) {
         }
 
     @Bean
-    fun cacheManager(): CacheManager = CaffeineCacheManager("managers").apply {
+    fun cacheManager(): CacheManager = CaffeineCacheManager(AdServiceImpl.CACHE_MANAGERS).apply {
         setCaffeine(Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(5, TimeUnit.MINUTES))
     }
 

@@ -21,15 +21,15 @@ class AdServiceImpl(
     private val adProperties: AdProperties,
 ) : AdService {
 
-    @Cacheable("managers")
+    @Cacheable(CACHE_MANAGERS)
     override fun getManager(username: String): String? {
         log.debug("getManager({})", username)
 
         val results = ldapTemplate.search(
             LdapQueryBuilder.query()
                 .base(adProperties.baseDn)
-                .where("sAMAccountName").`is`(username),
-            AttributesMapper { attrs -> attrs.get("manager")?.get()?.toString() },
+                .where(ATTR_SAM_ACCOUNT_NAME).`is`(username),
+            AttributesMapper { attrs -> attrs.get(ATTR_MANAGER)?.get()?.toString() },
         )
 
         if (results.isEmpty()) throw NotFoundException("User '$username' not found in AD")
@@ -39,8 +39,8 @@ class AdServiceImpl(
         return try {
             ldapTemplate.lookup(
                 LdapName(managerDn),
-                arrayOf("sAMAccountName"),
-                AttributesMapper { attrs -> attrs.get("sAMAccountName")?.get()?.toString() },
+                arrayOf(ATTR_SAM_ACCOUNT_NAME),
+                AttributesMapper { attrs -> attrs.get(ATTR_SAM_ACCOUNT_NAME)?.get()?.toString() },
             )
         } catch (e: NameNotFoundException) {
             log.warn("Manager DN '{}' for user '{}' not found in AD", managerDn, username)
@@ -52,6 +52,9 @@ class AdServiceImpl(
     }
 
     companion object {
+        const val ATTR_SAM_ACCOUNT_NAME = "sAMAccountName"
+        const val ATTR_MANAGER = "manager"
+        const val CACHE_MANAGERS = "managers"
         private val log = LoggerFactory.getLogger(AdServiceImpl::class.java)
     }
 }
