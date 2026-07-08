@@ -23,6 +23,12 @@ class AdConfig(private val adProperties: AdProperties) {
         setUrl(adProperties.url)
         setUserDn(adProperties.userDn)
         setPassword(adProperties.password)
+        setBaseEnvironmentProperties(
+            mapOf(
+                "com.sun.jndi.ldap.connect.timeout" to CONNECT_TIMEOUT_MS.toString(),
+                "com.sun.jndi.ldap.read.timeout" to READ_TIMEOUT_MS.toString(),
+            )
+        )
         afterPropertiesSet()
     }
 
@@ -35,5 +41,10 @@ class AdConfig(private val adProperties: AdProperties) {
     @Bean
     fun cacheManager(): CacheManager = CaffeineCacheManager("managers").apply {
         setCaffeine(Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(5, TimeUnit.MINUTES))
+    }
+
+    companion object {
+        private const val CONNECT_TIMEOUT_MS = 5_000
+        private const val READ_TIMEOUT_MS = 10_000
     }
 }

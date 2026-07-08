@@ -90,7 +90,10 @@ class EmployeeServiceImpl(
 
     override fun getManager(username: String): ManagerDTO {
         log.debug("getManager({})", username)
-        val svc = adService.getIfAvailable() ?: return ManagerDTO(null)
+        val svc = adService.getIfAvailable() ?: run {
+            checkUserExists(username)
+            return ManagerDTO(null)
+        }
         return ManagerDTO(svc.getManager(username))
     }
 

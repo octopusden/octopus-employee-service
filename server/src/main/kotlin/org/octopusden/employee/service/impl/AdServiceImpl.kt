@@ -6,10 +6,12 @@ import org.octopusden.employee.service.AdService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.ldap.NameNotFoundException
 import org.springframework.ldap.core.AttributesMapper
 import org.springframework.ldap.core.LdapTemplate
 import org.springframework.ldap.query.LdapQueryBuilder
 import org.springframework.stereotype.Service
+import javax.naming.InvalidNameException
 import javax.naming.ldap.LdapName
 
 @Service
@@ -34,11 +36,19 @@ class AdServiceImpl(
 
         val managerDn: String = results.first() ?: return null
 
-        return ldapTemplate.lookup(
-            LdapName(managerDn),
-            arrayOf("sAMAccountName"),
-            AttributesMapper { attrs -> attrs.get("sAMAccountName")?.get()?.toString() },
-        )
+        return try {
+            ldapTemplate.lookup(
+                LdapName(managerDn),
+                arrayOf("sAMAccountName"),
+                AttributesMapper { attrs -> attrs.get("sAMAccountName")?.get()?.toString() },
+            )
+        } catch (e: NameNotFoundException) {
+            log.warn("Manager DN '{}' for user '{}' not found in AD", managerDn, username)
+            null
+        } catch (e: InvalidNameException) {
+            log.warn("Invalid manager DN '{}' for user '{}'", managerDn, username)
+            null
+        }
     }
 
     companion object {
