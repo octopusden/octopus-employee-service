@@ -28,6 +28,7 @@ class AdServiceImpl(
         val results = ldapTemplate.search(
             LdapQueryBuilder.query()
                 .base(adProperties.baseDn)
+                .attributes(ATTR_MANAGER)
                 .where(ATTR_SAM_ACCOUNT_NAME).`is`(username),
             AttributesMapper { attrs -> attrs.get(ATTR_MANAGER)?.get()?.toString() },
         )
