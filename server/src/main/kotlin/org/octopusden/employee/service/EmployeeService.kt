@@ -1,6 +1,7 @@
 package org.octopusden.employee.service
 
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import java.time.LocalDate
@@ -11,4 +12,5 @@ interface EmployeeService {
     fun isUserAvailable(username: String): Boolean
     fun getEmployeeAvailableEarlier(employees: Set<String>): Employee
     fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO
+    fun getManager(username: String): ManagerDTO
 }

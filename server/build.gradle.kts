@@ -172,6 +172,10 @@ dependencies {
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${project.properties["jackson.version"]}")
 
+    implementation("org.springframework.ldap:spring-ldap-core")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":test-common"))
