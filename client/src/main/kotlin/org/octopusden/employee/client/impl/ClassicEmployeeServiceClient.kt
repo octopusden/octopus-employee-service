@@ -15,6 +15,7 @@ import feign.Feign
 import feign.Logger
 import feign.Request
 import feign.httpclient.ApacheHttpClient
+import org.apache.http.impl.client.HttpClientBuilder
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
@@ -76,8 +77,19 @@ class ClassicEmployeeServiceClient(
             objectMapper: ObjectMapper,
         ): EmployeeServiceClient {
             return Feign.builder()
-                .client(ApacheHttpClient())
-                .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, true))
+                .client(ApacheHttpClient(
+                    HttpClientBuilder.create()
+                        .apply {
+                            if (parametersProvider.getConnectionTtlMillis() >= 0)
+                                setConnectionTimeToLive(parametersProvider.getConnectionTtlMillis().toLong(), TimeUnit.MILLISECONDS)
+                        }
+                        .build()
+                ))
+                .options(Request.Options(
+                    parametersProvider.getConnectTimeoutMillis().toLong(), TimeUnit.MILLISECONDS,
+                    parametersProvider.getReadTimeoutMillis().toLong(), TimeUnit.MILLISECONDS,
+                    true
+                ))
                 .encoder(JacksonEncoder(objectMapper))
                 .decoder(JacksonDecoder(objectMapper))
                 .errorDecoder(EmployeeServiceErrorDecoder(objectMapper))
