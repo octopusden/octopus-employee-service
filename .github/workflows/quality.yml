@@ -12,4 +12,11 @@ jobs:
     uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@v2.3.5
     with:
       java-version: '21'
+      # Coverage is disabled for this repo (octopusQuality { coverage { enabled = false } }), so
+      # qualityCoverage is meant to be a no-op. Its aggregate would otherwise pull in the
+      # integration/functional test tasks, which require an INFRA-bound mockserver via
+      # docker-compose (composeBuild/composeUp/migrateMockData) or OKD — unavailable on the GitHub
+      # runner (composeBuild → "Cannot run program 'docker-compose'"). Exclude those infra-bound
+      # test tasks so the coverage gate runs the runner-safe unit tests only.
+      coverage-command: ./gradlew qualityCoverage --no-daemon --stacktrace -x :employee-service:test -x :ft:test
     secrets: inherit
