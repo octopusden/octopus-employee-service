@@ -9,16 +9,13 @@ import java.time.LocalDate
 
 @Configuration
 class WebConfig : WebMvcConfigurer {
-
     override fun addViewControllers(registry: ViewControllerRegistry) {
         registry.addRedirectViewController("/", "swagger-ui/index.html")
     }
 
     override fun addFormatters(registry: FormatterRegistry) {
         registry.addConverter(object : Converter<String, LocalDate> {
-            override fun convert(source: String): LocalDate {
-                return LocalDate.parse(source)
-            }
+            override fun convert(source: String): LocalDate = LocalDate.parse(source)
         })
     }
 }

@@ -10,5 +10,5 @@ data class PlannedTimeDTO(
     val user: String,
     val project: String,
     val activity: String,
-    val md: BigDecimal
+    val md: BigDecimal,
 )

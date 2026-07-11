@@ -13,49 +13,62 @@ import java.util.stream.Stream
 abstract class BaseEmployeesControllerTest : BaseTest() {
     @ParameterizedTest
     @MethodSource("availableEarlier")
-    fun getEmployeeAvailableEarlierTest(employees: Set<String>, expectedEmployee: Employee) {
+    fun getEmployeeAvailableEarlierTest(
+        employees: Set<String>,
+        expectedEmployee: Employee,
+    ) {
         val employeeAvailableEarlier = getEmployeeAvailableEarlier(employees)
         Assertions.assertEquals(expectedEmployee, employeeAvailableEarlier)
     }
 
     @ParameterizedTest
     @MethodSource("workingDays")
-    fun getWorkingDaysTest(dateFrom: String, dateTo: String, expectedWorkingDays: Int) {
+    fun getWorkingDaysTest(
+        dateFrom: String,
+        dateTo: String,
+        expectedWorkingDays: Int,
+    ) {
         val workingDays = getWorkingDays(dateFrom, dateTo)
         Assertions.assertEquals(expectedWorkingDays, workingDays.workingDays)
-
     }
 
     protected abstract fun getEmployeeAvailableEarlier(employees: Set<String>): Employee
 
-    protected abstract fun getWorkingDays(fromDate: String, toDate: String): WorkingDaysDTO
+    protected abstract fun getWorkingDays(
+        fromDate: String,
+        toDate: String,
+    ): WorkingDaysDTO
 
-    //<editor-fold defaultstate="collapsed" desc="test data">
-    private fun availableEarlier(): Stream<Arguments> = Stream.of(
-        Arguments.of(
-            setOf("absent1", "absent2"), Employee("absent2", true)
-        ),
-        Arguments.of(
-            setOf("absent1", "absent2", "employee"), Employee("employee", true)
+    // <editor-fold defaultstate="collapsed" desc="test data">
+    private fun availableEarlier(): Stream<Arguments> =
+        Stream.of(
+            Arguments.of(
+                setOf("absent1", "absent2"),
+                Employee("absent2", true),
+            ),
+            Arguments.of(
+                setOf("absent1", "absent2", "employee"),
+                Employee("employee", true),
+            ),
         )
-    )
 
-    private fun workingDays(): Stream<Arguments> {
-        return Stream.of(
+    private fun workingDays(): Stream<Arguments> =
+        Stream.of(
             Arguments.of(
                 "2021-01-01",
                 "2021-01-31",
-                15
-            ), Arguments.of(
+                15,
+            ),
+            Arguments.of(
                 "2021-01-11",
                 "2021-01-31",
-                15
-            ), Arguments.of(
+                15,
+            ),
+            Arguments.of(
                 "2021-01-01",
                 "2021-01-10",
-                0
-            )
+                0,
+            ),
         )
-    }
-    //</editor-fold>
+    // </editor-fold>
 }

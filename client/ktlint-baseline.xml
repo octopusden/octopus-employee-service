@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/main/kotlin/org/octopusden/employee/client/EmployeeServiceRetry.kt">
+        <error line="8" column="11" source="standard:property-naming" />
+        <error line="9" column="11" source="standard:property-naming" />
+        <error line="10" column="11" source="standard:property-naming" />
+    </file>
+</baseline>

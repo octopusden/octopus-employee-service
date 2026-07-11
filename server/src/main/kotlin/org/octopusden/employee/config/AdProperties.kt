@@ -9,6 +9,5 @@ data class AdProperties(
     val password: String = "",
     val baseDn: String = "",
 ) {
-    override fun toString(): String =
-        "AdProperties(url='$url', userDn='$userDn', password='***', baseDn='$baseDn')"
+    override fun toString(): String = "AdProperties(url='$url', userDn='$userDn', password='***', baseDn='$baseDn')"
 }

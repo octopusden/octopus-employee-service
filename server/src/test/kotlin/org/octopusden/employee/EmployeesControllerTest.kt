@@ -25,7 +25,7 @@ import java.util.Locale
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     classes = [EmployeeServiceApplication::class],
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 )
 @ActiveProfiles("test")
 @WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
@@ -41,26 +41,33 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
         mapper.setLocale(Locale.ENGLISH)
     }
 
-    override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee = mvc.perform(
-        MockMvcRequestBuilders.get("/employees/available-earlier")
-            .param("employees", *employees.toTypedArray())
-            .accept(MediaType.APPLICATION_JSON)
-    )
-        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
-        .andReturn()
-        .response
-        .toObject(object : TypeReference<Employee>() {})
+    override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee =
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employees/available-earlier")
+                    .param("employees", *employees.toTypedArray())
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn()
+            .response
+            .toObject(object : TypeReference<Employee>() {})
 
-    override fun getWorkingDays(fromDate: String, toDate: String): WorkingDaysDTO = mvc.perform(
-        MockMvcRequestBuilders.get("/employees/working-days")
-            .param("fromDate", fromDate.format(isoLocalDateFormatter))
-            .param("toDate", toDate.format(isoLocalDateFormatter))
-            .accept(MediaType.APPLICATION_JSON)
-    )
-        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
-        .andReturn()
-        .response
-        .toObject(object : TypeReference<WorkingDaysDTO>() {})
+    override fun getWorkingDays(
+        fromDate: String,
+        toDate: String,
+    ): WorkingDaysDTO =
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employees/working-days")
+                    .param("fromDate", fromDate.format(isoLocalDateFormatter))
+                    .param("toDate", toDate.format(isoLocalDateFormatter))
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn()
+            .response
+            .toObject(object : TypeReference<WorkingDaysDTO>() {})
 
     private fun <T> MockHttpServletResponse.toObject(typeReference: TypeReference<T>): T =
         mapper.readValue(this.contentAsByteArray, typeReference)

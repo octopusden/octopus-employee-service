@@ -6,19 +6,25 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.16.9"
 }
 
-fun String.getPort() = when (this) {
-    "gateway" -> 8765
-    "employee" -> 8080
-    "mockserver" -> 1080
-    else -> throw Exception("Unknown service '$this'")
-}
+fun String.getPort() =
+    when (this) {
+        "gateway" -> 8765
+        "employee" -> 8080
+        "mockserver" -> 1080
+        else -> throw Exception("Unknown service '$this'")
+    }
+
 fun getOkdExternalHost(serviceName: String) = "${ocTemplate.getPod(serviceName)}-service:${serviceName.getPort()}"
+
 fun String.getExt() = project.ext[this] as String
 
 dockerCompose {
     useComposeFiles.add("${projectDir}${File.separator}docker${File.separator}docker-compose.yml")
     waitForTcpPorts = true
-    captureContainersOutputToFiles = layout.buildDirectory.file("docker-logs").get().asFile
+    captureContainersOutputToFiles = layout.buildDirectory
+        .file("docker-logs")
+        .get()
+        .asFile
     environment.putAll(
         mapOf(
             "EMPLOYEE_SERVICE_VERSION" to project.version,
@@ -33,8 +39,8 @@ dockerCompose {
             "TEST_API_GATEWAY_HOST" to "api-gateway:8765",
             "TEST_API_GATEWAY_HOST_EXTERNAL" to "localhost:8765",
             "TEST_MOCK_SERVER_HOST" to "mockserver:1080",
-            "TEST_EMPLOYEE_SERVICE_HOST" to "employee-service:8080"
-        )
+            "TEST_EMPLOYEE_SERVICE_HOST" to "employee-service:8080",
+        ),
     )
 }
 
@@ -67,47 +73,59 @@ ocTemplate {
     namespace.set("okdProject".getExt())
     prefix.set("employee-ft")
 
-    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let{
+    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let {
         webConsoleUrl.set(it)
     }
 
     service("mockserver") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
-        parameters.set(mapOf(
-            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
-        ))
+        parameters.set(
+            mapOf(
+                "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+                "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+                "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String,
+            ),
+        )
     }
 
     service("gateway") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/api-gateway.yaml"))
-        parameters.set(mapOf(
-            "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "APPLICATION_DEV_CONTENT" to layout.projectDirectory.dir("docker/api-gateway.yaml").asFile.readText(),
-            "API_GATEWAY_VERSION" to properties["api-gateway.version"] as String,
-            "AUTH_SERVER_URL" to "authServerUrl".getExt(),
-            "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
-            "AUTH_SERVER_CLIENT_ID" to "authServerClientId".getExt(),
-            "AUTH_SERVER_CLIENT_SECRET" to "authServerClientSecret".getExt(),
-            "TEST_EMPLOYEE_SERVICE_HOST" to getOkdExternalHost("employee"),
-            "TEST_API_GATEWAY_HOST_EXTERNAL" to getOkdExternalHost("gateway")
-        ))
+        parameters.set(
+            mapOf(
+                "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
+                "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+                "APPLICATION_DEV_CONTENT" to layout.projectDirectory
+                    .dir("docker/api-gateway.yaml")
+                    .asFile
+                    .readText(),
+                "API_GATEWAY_VERSION" to properties["api-gateway.version"] as String,
+                "AUTH_SERVER_URL" to "authServerUrl".getExt(),
+                "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
+                "AUTH_SERVER_CLIENT_ID" to "authServerClientId".getExt(),
+                "AUTH_SERVER_CLIENT_SECRET" to "authServerClientSecret".getExt(),
+                "TEST_EMPLOYEE_SERVICE_HOST" to getOkdExternalHost("employee"),
+                "TEST_API_GATEWAY_HOST_EXTERNAL" to getOkdExternalHost("gateway"),
+            ),
+        )
     }
 
     service("employee") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/employee-service.yaml"))
-        parameters.set(mapOf(
-            "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "APPLICATION_DEV_CONTENT" to layout.projectDirectory.dir("docker/employee-service.yaml").asFile.readText(),
-            "EMPLOYEE_SERVICE_VERSION" to project.version as String,
-            "AUTH_SERVER_URL" to "authServerUrl".getExt(),
-            "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
-            "TEST_API_GATEWAY_HOST" to getOkdExternalHost("gateway"),
-            "TEST_MOCK_SERVER_HOST" to getOkdExternalHost("mockserver")
-        ))
+        parameters.set(
+            mapOf(
+                "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
+                "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+                "APPLICATION_DEV_CONTENT" to layout.projectDirectory
+                    .dir("docker/employee-service.yaml")
+                    .asFile
+                    .readText(),
+                "EMPLOYEE_SERVICE_VERSION" to project.version as String,
+                "AUTH_SERVER_URL" to "authServerUrl".getExt(),
+                "AUTH_SERVER_REALM" to "authServerRealm".getExt(),
+                "TEST_API_GATEWAY_HOST" to getOkdExternalHost("gateway"),
+                "TEST_MOCK_SERVER_HOST" to getOkdExternalHost("mockserver"),
+            ),
+        )
     }
 }
 
@@ -156,8 +174,8 @@ val ft by tasks.creating(Test::class) {
         mapOf(
             "buildVersion" to project.version,
             "employee-service.user" to "employeeServiceUser".getExt(),
-            "employee-service.password" to "employeeServicePassword".getExt()
-        )
+            "employee-service.password" to "employeeServicePassword".getExt(),
+        ),
     )
 }
 

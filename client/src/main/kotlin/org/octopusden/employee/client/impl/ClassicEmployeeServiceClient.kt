@@ -3,23 +3,23 @@ package org.octopusden.employee.client.impl
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import feign.Feign
+import feign.Logger
+import feign.Request
+import feign.httpclient.ApacheHttpClient
+import feign.jackson.JacksonDecoder
+import feign.jackson.JacksonEncoder
+import feign.slf4j.Slf4jLogger
+import org.apache.http.impl.client.HttpClientBuilder
 import org.octopusden.employee.client.EmployeeServiceClient
 import org.octopusden.employee.client.EmployeeServiceErrorDecoder
 import org.octopusden.employee.client.EmployeeServiceRetry
 import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.Health
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.ServerInfo
-import feign.Feign
-import feign.Logger
-import feign.Request
-import feign.httpclient.ApacheHttpClient
-import org.apache.http.impl.client.HttpClientBuilder
-import feign.jackson.JacksonDecoder
-import feign.jackson.JacksonEncoder
-import feign.slf4j.Slf4jLogger
-import org.octopusden.employee.client.common.dto.Health
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import java.nio.charset.Charset
 import java.time.LocalDate
@@ -31,30 +31,36 @@ class ClassicEmployeeServiceClient(
     private val mapper: ObjectMapper,
 ) : EmployeeServiceClient {
     private var client =
-        createClient(parametersProvider,
-            mapper)
+        createClient(
+            parametersProvider,
+            mapper,
+        )
 
     constructor(parametersProvider: EmployeeServiceClientParametersProvider) : this(
         parametersProvider,
-        getMapper()
+        getMapper(),
     )
 
     override fun getServerInfo(): ServerInfo = client.getServerInfo()
 
-    override fun getRequiredTime(employee: String, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO =
-        client.getRequiredTime(employee, fromDate, toDate)
+    override fun getRequiredTime(
+        employee: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): RequiredTimeDTO = client.getRequiredTime(employee, fromDate, toDate)
 
     override fun isEmployeeAvailable(employee: String): Boolean = client.isEmployeeAvailable(employee)
 
     override fun getEmployee(employee: String): Employee = client.getEmployee(employee)
 
-    override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee =
-        client.getEmployeeAvailableEarlier(employees)
+    override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee = client.getEmployeeAvailableEarlier(employees)
 
     override fun getCustomers(): Set<CustomerDTO> = client.getCustomers()
 
-    override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO =
-        client.getWorkingDays(fromDate, toDate)
+    override fun getWorkingDays(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): WorkingDaysDTO = client.getWorkingDays(fromDate, toDate)
 
     fun updateApiParameters(apiParametersProvider: EmployeeServiceClientParametersProvider) {
         client = createClient(apiParametersProvider, mapper)
@@ -66,6 +72,7 @@ class ClassicEmployeeServiceClient(
 
     companion object {
         private val base64Encoder = Base64.getEncoder()
+
         private fun getMapper(): ObjectMapper {
             val objectMapper = jacksonObjectMapper()
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -75,27 +82,34 @@ class ClassicEmployeeServiceClient(
         private fun createClient(
             parametersProvider: EmployeeServiceClientParametersProvider,
             objectMapper: ObjectMapper,
-        ): EmployeeServiceClient {
-            return Feign.builder()
-                .client(ApacheHttpClient(
-                    HttpClientBuilder.create()
-                        .apply {
-                            if (parametersProvider.getConnectionTtlMillis() >= 0)
-                                setConnectionTimeToLive(parametersProvider.getConnectionTtlMillis().toLong(), TimeUnit.MILLISECONDS)
-                        }
-                        .build()
-                ))
-                .options(Request.Options(
-                    parametersProvider.getConnectTimeoutMillis().toLong(), TimeUnit.MILLISECONDS,
-                    parametersProvider.getReadTimeoutMillis().toLong(), TimeUnit.MILLISECONDS,
-                    true
-                ))
-                .encoder(JacksonEncoder(objectMapper))
+        ): EmployeeServiceClient =
+            Feign
+                .builder()
+                .client(
+                    ApacheHttpClient(
+                        HttpClientBuilder
+                            .create()
+                            .apply {
+                                if (parametersProvider.getConnectionTtlMillis() >= 0) {
+                                    setConnectionTimeToLive(parametersProvider.getConnectionTtlMillis().toLong(), TimeUnit.MILLISECONDS)
+                                }
+                            }.build(),
+                    ),
+                ).options(
+                    Request.Options(
+                        parametersProvider.getConnectTimeoutMillis().toLong(),
+                        TimeUnit.MILLISECONDS,
+                        parametersProvider.getReadTimeoutMillis().toLong(),
+                        TimeUnit.MILLISECONDS,
+                        true,
+                    ),
+                ).encoder(JacksonEncoder(objectMapper))
                 .decoder(JacksonDecoder(objectMapper))
                 .errorDecoder(EmployeeServiceErrorDecoder(objectMapper))
                 .retryer(EmployeeServiceRetry(parametersProvider.getTimeRetryInMillis()))
                 .requestInterceptor { requestTemplate ->
-                    val authHeader = parametersProvider.getBearerToken()
+                    val authHeader = parametersProvider
+                        .getBearerToken()
                         ?.let { token ->
                             if (token.isNotBlank()) {
                                 "Bearer $token"
@@ -103,7 +117,8 @@ class ClassicEmployeeServiceClient(
                                 null
                             }
                         }
-                        ?: parametersProvider.getBasicCredentials()
+                        ?: parametersProvider
+                            .getBasicCredentials()
                             ?.let { basicCredentials ->
                                 if (basicCredentials.replace(":", "").isNotBlank()) {
                                     "Basic ${
@@ -115,10 +130,8 @@ class ClassicEmployeeServiceClient(
                             }
                         ?: throw IllegalArgumentException("Bearer token or basic credentials must be provided")
                     requestTemplate.header("Authorization", authHeader)
-                }
-                .logger(Slf4jLogger(EmployeeServiceClient::class.java))
+                }.logger(Slf4jLogger(EmployeeServiceClient::class.java))
                 .logLevel(Logger.Level.FULL)
                 .target(EmployeeServiceClient::class.java, parametersProvider.getApiUrl())
-        }
     }
 }

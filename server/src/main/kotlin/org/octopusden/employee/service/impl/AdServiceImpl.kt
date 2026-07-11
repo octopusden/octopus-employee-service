@@ -20,16 +20,17 @@ class AdServiceImpl(
     private val ldapTemplate: LdapTemplate,
     private val adProperties: AdProperties,
 ) : AdService {
-
     @Cacheable(CACHE_MANAGERS)
     override fun getManager(username: String): String? {
         log.debug("getManager({})", username)
 
         val results = ldapTemplate.search(
-            LdapQueryBuilder.query()
+            LdapQueryBuilder
+                .query()
                 .base(adProperties.baseDn)
                 .attributes(ATTR_MANAGER)
-                .where(ATTR_SAM_ACCOUNT_NAME).`is`(username),
+                .where(ATTR_SAM_ACCOUNT_NAME)
+                .`is`(username),
             AttributesMapper { attrs -> attrs.get(ATTR_MANAGER)?.get()?.toString() },
         )
 

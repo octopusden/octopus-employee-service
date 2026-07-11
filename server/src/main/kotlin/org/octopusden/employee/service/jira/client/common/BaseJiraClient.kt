@@ -5,5 +5,7 @@ import feign.RequestLine
 
 interface BaseJiraClient {
     @RequestLine("GET /rest/api/2/user?username={username}")
-    fun getUser(@Param("username") username: String): JiraUser
+    fun getUser(
+        @Param("username") username: String,
+    ): JiraUser
 }

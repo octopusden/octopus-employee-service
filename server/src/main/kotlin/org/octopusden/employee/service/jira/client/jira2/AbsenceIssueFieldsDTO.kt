@@ -8,8 +8,8 @@ import java.time.LocalDate
 data class AbsenceIssueFieldsDTO(
     @JsonProperty(employeeFieldId) val employee: JiraUser,
     @JsonProperty(fromDateFieldId) val from: LocalDate,
-    @JsonProperty(toDateFieldId) val to: LocalDate
-): BaseIssueFieldsDTO() {
+    @JsonProperty(toDateFieldId) val to: LocalDate,
+) : BaseIssueFieldsDTO() {
     companion object {
         const val employeeFieldId = "customfield_16402"
         const val fromDateFieldId = "customfield_10800"

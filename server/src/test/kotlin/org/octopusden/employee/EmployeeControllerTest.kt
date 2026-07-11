@@ -2,12 +2,6 @@ package org.octopusden.employee
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.octopusden.employee.client.common.dto.Employee
-import org.octopusden.employee.client.common.dto.ErrorResponse
-import org.octopusden.employee.client.common.dto.ManagerDTO
-import org.octopusden.employee.client.common.dto.RequiredTimeDTO
-import org.octopusden.employee.client.common.exception.NotFoundException
-import org.octopusden.employee.service.AdService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -15,6 +9,12 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.`when`
+import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.ErrorResponse
+import org.octopusden.employee.client.common.dto.ManagerDTO
+import org.octopusden.employee.client.common.dto.RequiredTimeDTO
+import org.octopusden.employee.client.common.exception.NotFoundException
+import org.octopusden.employee.service.AdService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -35,12 +35,11 @@ import java.util.Locale
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     classes = [EmployeeServiceApplication::class],
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 )
 @ActiveProfiles("test")
 @WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
 class EmployeeControllerTest : BaseEmployeeControllerTest() {
-
     @Autowired
     private lateinit var mvc: MockMvc
 
@@ -55,46 +54,53 @@ class EmployeeControllerTest : BaseEmployeeControllerTest() {
         mapper.setLocale(Locale.ENGLISH)
     }
 
-    override fun getRequiredTime(employee: String, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO =
-        mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{employee}/required-time", employee)
-                .param("fromDate", fromDate.format(isoLocalDateFormatter))
-                .param("toDate", toDate.format(isoLocalDateFormatter))
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+    override fun getRequiredTime(
+        employee: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): RequiredTimeDTO =
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{employee}/required-time", employee)
+                    .param("fromDate", fromDate.format(isoLocalDateFormatter))
+                    .param("toDate", toDate.format(isoLocalDateFormatter))
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
             .andReturn()
             .response
             .toObject(object : TypeReference<RequiredTimeDTO>() {})
 
     override fun getEmployee(employee: String): Employee =
-        mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{employee}", employee)
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{employee}", employee)
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
             .andReturn()
             .response
             .toObject(object : TypeReference<Employee>() {})
 
-
     override fun getNotExistedEmployee(employee: String): String =
-        mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{employee}", employee)
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().is4xxClientError)
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{employee}", employee)
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is4xxClientError)
             .andReturn()
             .response
             .toObject(object : TypeReference<ErrorResponse>() {})
             .errorMessage
 
     override fun isEmployeeAvailable(employee: String): Boolean =
-        mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{employee}/available", employee)
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{employee}/available", employee)
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
             .andReturn()
             .response
             .contentAsString!!
@@ -103,11 +109,12 @@ class EmployeeControllerTest : BaseEmployeeControllerTest() {
     @Test
     fun getManagerWithManager() {
         `when`(adService.getManager("employee")).thenReturn("manager")
-        val result = mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{username}/manager", "employee")
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().isOk)
+        val result = mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{username}/manager", "employee")
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn()
             .response
             .toObject(object : TypeReference<ManagerDTO>() {})
@@ -117,11 +124,12 @@ class EmployeeControllerTest : BaseEmployeeControllerTest() {
     @Test
     fun getManagerWithNoManager() {
         `when`(adService.getManager("employee")).thenReturn(null)
-        val result = mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{username}/manager", "employee")
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().isOk)
+        val result = mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{username}/manager", "employee")
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn()
             .response
             .toObject(object : TypeReference<ManagerDTO>() {})
@@ -131,12 +139,14 @@ class EmployeeControllerTest : BaseEmployeeControllerTest() {
     @Test
     fun getManagerUserNotFound() {
         doThrow(NotFoundException("User 'nonexistent' not found in AD"))
-            .`when`(adService).getManager("nonexistent")
-        mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{username}/manager", "nonexistent")
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().isNotFound)
+            .`when`(adService)
+            .getManager("nonexistent")
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{username}/manager", "nonexistent")
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
     private fun <T> MockHttpServletResponse.toObject(typeReference: TypeReference<T>): T =

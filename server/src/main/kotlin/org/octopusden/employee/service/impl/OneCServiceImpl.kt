@@ -15,21 +15,27 @@ import java.time.LocalDate
 @EnableConfigurationProperties(EmployeeServiceProperties::class)
 class OneCServiceImpl(
     private val oneCClient: OneCClient,
-    private val employeeServiceProperties: EmployeeServiceProperties
+    private val employeeServiceProperties: EmployeeServiceProperties,
 ) : OneCService {
-
-    override fun getRequiredTime(employee: Employee, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO {
-        val requiredDays = oneCClient.getPlannedTime(employee.username, fromDate, toDate)
-            .map { it.md }.fold(BigDecimal(0)) { acc, next ->
-            acc.plus(next)
-        }
+    override fun getRequiredTime(
+        employee: Employee,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): RequiredTimeDTO {
+        val requiredDays = oneCClient
+            .getPlannedTime(employee.username, fromDate, toDate)
+            .map { it.md }
+            .fold(BigDecimal(0)) { acc, next ->
+                acc.plus(next)
+            }
         return RequiredTimeDTO(
             employee,
-            requiredDays.multiply(employeeServiceProperties.workDayHours.toBigDecimal()).toInt()
+            requiredDays.multiply(employeeServiceProperties.workDayHours.toBigDecimal()).toInt(),
         )
     }
 
-    override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
-        return oneCClient.getWorkingDays(fromDate, toDate)
-    }
+    override fun getWorkingDays(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): WorkingDaysDTO = oneCClient.getWorkingDays(fromDate, toDate)
 }

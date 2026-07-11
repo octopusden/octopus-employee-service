@@ -82,12 +82,19 @@ tasks.getByName("dockerPushImage") {
 }
 
 dockerCompose {
-    useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
+    useComposeFiles.add("$projectDir/docker/docker-compose.yml")
     waitForTcpPorts = true
-    captureContainersOutputToFiles = layout.buildDirectory.dir("docker-logs").get().asFile
-    environment.putAll(mapOf("DOCKER_REGISTRY" to "dockerRegistry".getExt(), "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String))
+    captureContainersOutputToFiles = layout.buildDirectory
+        .dir("docker-logs")
+        .get()
+        .asFile
+    environment.putAll(
+        mapOf(
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String,
+        ),
+    )
 }
-
 
 sourceSets {
     test {
@@ -103,17 +110,19 @@ ocTemplate {
     namespace.set("okdProject".getExt())
     prefix.set("employee-ut")
 
-    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let{
+    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let {
         webConsoleUrl.set(it)
     }
 
     service("mockserver") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
-        parameters.set(mapOf(
-            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
-        ))
+        parameters.set(
+            mapOf(
+                "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+                "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+                "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String,
+            ),
+        )
     }
 }
 

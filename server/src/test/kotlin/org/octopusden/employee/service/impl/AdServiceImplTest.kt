@@ -13,7 +13,6 @@ import org.springframework.ldap.query.LdapQuery
 import javax.naming.Name
 
 class AdServiceImplTest {
-
     private val ldapTemplate = Mockito.mock(LdapTemplate::class.java)
     private val adProperties = AdProperties(baseDn = "OU=Users,DC=example,DC=com")
     private val adService = AdServiceImpl(ldapTemplate, adProperties)
@@ -31,7 +30,8 @@ class AdServiceImplTest {
         stubSearch(listOf(null))
 
         Assertions.assertNull(adService.getManager("employee"))
-        Mockito.verify(ldapTemplate, Mockito.never())
+        Mockito
+            .verify(ldapTemplate, Mockito.never())
             .lookup(any(Name::class.java), any<Array<String>>(), any<AttributesMapper<String?>>())
     }
 
@@ -45,7 +45,8 @@ class AdServiceImplTest {
     @Test
     fun getManagerReturnsNullWhenManagerDnIsStale() {
         stubSearch(listOf("CN=Ghost,OU=Users,DC=example,DC=com"))
-        Mockito.`when`(ldapTemplate.lookup(any(Name::class.java), any<Array<String>>(), any<AttributesMapper<String?>>()))
+        Mockito
+            .`when`(ldapTemplate.lookup(any(Name::class.java), any<Array<String>>(), any<AttributesMapper<String?>>()))
             .thenThrow(NameNotFoundException("not found"))
 
         Assertions.assertNull(adService.getManager("employee"))
@@ -56,17 +57,20 @@ class AdServiceImplTest {
         stubSearch(listOf("not-a-valid-dn-no-equals"))
 
         Assertions.assertNull(adService.getManager("employee"))
-        Mockito.verify(ldapTemplate, Mockito.never())
+        Mockito
+            .verify(ldapTemplate, Mockito.never())
             .lookup(any(Name::class.java), any<Array<String>>(), any<AttributesMapper<String?>>())
     }
 
     private fun stubSearch(result: List<String?>) {
-        Mockito.`when`(ldapTemplate.search(any<LdapQuery>(), any<AttributesMapper<String?>>()))
+        Mockito
+            .`when`(ldapTemplate.search(any<LdapQuery>(), any<AttributesMapper<String?>>()))
             .thenReturn(result)
     }
 
     private fun stubLookup(result: String?) {
-        Mockito.`when`(ldapTemplate.lookup(any(Name::class.java), any<Array<String>>(), any<AttributesMapper<String?>>()))
+        Mockito
+            .`when`(ldapTemplate.lookup(any(Name::class.java), any<Array<String>>(), any<AttributesMapper<String?>>()))
             .thenReturn(result)
     }
 }

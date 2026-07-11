@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @ControllerAdvice
 class ExceptionInfoHandler {
-
     @ExceptionHandler(NotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
@@ -42,8 +41,9 @@ class ExceptionInfoHandler {
         private fun getErrorResponse(exception: Exception): ErrorResponse {
             val errorCode = EmployeeServiceErrorCode.getErrorCode(exception)
             return ErrorResponse(
-                errorCode, exception.message
-                    ?: errorCode.simpleMessage
+                errorCode,
+                exception.message
+                    ?: errorCode.simpleMessage,
             )
         }
     }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/main/kotlin/org/octopusden/employee/service/jira/client/jira2/AbsenceIssueFieldsDTO.kt">
+        <error line="14" column="19" source="standard:property-naming" />
+        <error line="15" column="19" source="standard:property-naming" />
+        <error line="16" column="19" source="standard:property-naming" />
+    </file>
+    <file name="src/main/kotlin/org/octopusden/employee/service/onec/client/OneCRetry.kt">
+        <error line="8" column="11" source="standard:property-naming" />
+        <error line="9" column="11" source="standard:property-naming" />
+        <error line="10" column="11" source="standard:property-naming" />
+    </file>
+</baseline>
