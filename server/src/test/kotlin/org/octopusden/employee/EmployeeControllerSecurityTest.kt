@@ -21,11 +21,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     classes = [EmployeeServiceApplication::class],
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 )
 @ActiveProfiles("test")
 class EmployeeControllerSecurityTest {
-
     @Autowired
     private lateinit var mvc: MockMvc
 
@@ -47,12 +46,13 @@ class EmployeeControllerSecurityTest {
     }
 
     private fun getRequiredTimeRequest(expectedStatus: ResultMatcher) {
-        mvc.perform(
-            MockMvcRequestBuilders.get("/employee/{employee}/required-time", "employee")
-                .param("fromDate", "2021-01-01")
-                .param("toDate", "2021-01-31")
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(expectedStatus)
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/employee/{employee}/required-time", "employee")
+                    .param("fromDate", "2021-01-01")
+                    .param("toDate", "2021-01-31")
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(expectedStatus)
     }
 }

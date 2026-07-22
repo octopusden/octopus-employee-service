@@ -5,11 +5,18 @@ import feign.Response
 import feign.codec.ErrorDecoder
 import org.slf4j.LoggerFactory
 
-class JiraErrorDecoder(private val objectMapper: ObjectMapper) : ErrorDecoder {
-    override fun decode(methodKey: String, response: Response): Exception {
+class JiraErrorDecoder(
+    private val objectMapper: ObjectMapper,
+) : ErrorDecoder {
+    override fun decode(
+        methodKey: String,
+        response: Response,
+    ): Exception {
         val message = try {
-            objectMapper.readValue(response.body().asInputStream(), JiraErrorResponse::class.java)
-                .errorMessages.joinToString(separator = ". ")
+            objectMapper
+                .readValue(response.body().asInputStream(), JiraErrorResponse::class.java)
+                .errorMessages
+                .joinToString(separator = ". ")
         } catch (e: Exception) {
             log.error(e.message, e)
             "Error executing Jira request: $methodKey"

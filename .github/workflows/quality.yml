@@ -1,0 +1,22 @@
+# INTERNAL — runs on push to main, on manual dispatch, and as a workflow_call unit of the Merge Gate.
+name: Quality
+
+on:
+  push:
+    branches: [ main ]
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  quality:
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@v2.4.1
+    with:
+      java-version: '21'
+      # Coverage is disabled for this repo (octopusQuality { coverage { enabled = false } }), so
+      # qualityCoverage is meant to be a no-op. Its aggregate would otherwise pull in the
+      # integration/functional test tasks, which require an INFRA-bound mockserver via
+      # docker-compose (composeBuild/composeUp/migrateMockData) or OKD — unavailable on the GitHub
+      # runner (composeBuild → "Cannot run program 'docker-compose'"). Exclude those infra-bound
+      # test tasks so the coverage gate runs the runner-safe unit tests only.
+      coverage-command: ./gradlew qualityCoverage --no-daemon --stacktrace -x :employee-service:test -x :ft:test
+    secrets: inherit

@@ -6,4 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
  * The model to transfer a health information
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Health(val status: String)
+data class Health(
+    val status: String,
+)

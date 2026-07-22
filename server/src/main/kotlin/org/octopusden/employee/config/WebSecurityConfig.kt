@@ -14,6 +14,6 @@ class WebSecurityConfig(
     authServerClient: AuthServerClient,
     securityProperties: SecurityProperties,
 ) : CloudCommonWebSecurityConfig(
-    authServerClient = authServerClient,
-    securityProperties = securityProperties,
-)
+        authServerClient = authServerClient,
+        securityProperties = securityProperties,
+    )

@@ -2,9 +2,9 @@ package org.octopusden.employee
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     classes = [EmployeeServiceApplication::class],
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 )
 @ActiveProfiles("test")
 @WithMockUser(authorities = ["ROLE_EMPLOYEE_SERVICE_USER_DEV"])
@@ -33,14 +33,16 @@ class CustomerControllerTest : BaseCustomersControllerTest() {
     @Autowired
     private lateinit var mapper: ObjectMapper
 
-    override fun getCustomers(): Set<CustomerDTO> = mvc.perform(
-        MockMvcRequestBuilders.get("/customers")
-            .accept(MediaType.APPLICATION_JSON)
-    )
-        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
-        .andReturn()
-        .response
-        .toObject(object : TypeReference<Set<CustomerDTO>>() {})
+    override fun getCustomers(): Set<CustomerDTO> =
+        mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/customers")
+                    .accept(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn()
+            .response
+            .toObject(object : TypeReference<Set<CustomerDTO>>() {})
 
     private fun <T> MockHttpServletResponse.toObject(typeReference: TypeReference<T>): T =
         mapper.readValue(this.contentAsByteArray, typeReference)

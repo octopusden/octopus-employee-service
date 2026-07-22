@@ -1,18 +1,17 @@
 package org.octopusden.employee
 
-import org.octopusden.employee.client.EmployeeServiceClient
-import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import feign.FeignException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.octopusden.employee.client.EmployeeServiceClient
+import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import java.time.LocalDate
 
 private const val EXISTED_EMPLOYEE = "employee"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EmployeeControllerSecurityTest {
-
     private val securedClient = TestFtUtils.getSecuredClient()
     private val fakeTokenClient = TestFtUtils.getFakeTokenClient()
 

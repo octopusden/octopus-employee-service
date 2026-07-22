@@ -4,5 +4,5 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class JiraErrorResponse(
-    val errorMessages: List<String>
+    val errorMessages: List<String>,
 )

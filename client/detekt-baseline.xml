@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ClassOrdering:EmployeeServiceRetry.kt$EmployeeServiceRetry$Companion</ID>
+    <ID>SwallowedException:EmployeeServiceErrorDecoder.kt$EmployeeServiceErrorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:EmployeeServiceErrorDecoder.kt$EmployeeServiceErrorDecoder$e: Exception</ID>
+    <ID>TopLevelPropertyNaming:EmployeeServiceRetry.kt$const val numberAttempts: Int = 5</ID>
+    <ID>TopLevelPropertyNaming:EmployeeServiceRetry.kt$const val numberIterations: Int = 5</ID>
+    <ID>TopLevelPropertyNaming:EmployeeServiceRetry.kt$const val timeDelayAttempt: Int = 300</ID>
+  </CurrentIssues>
+</SmellBaseline>

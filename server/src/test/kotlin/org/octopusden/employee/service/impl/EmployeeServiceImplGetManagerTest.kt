@@ -15,7 +15,6 @@ import org.octopusden.employee.service.jira.client.jira2.Jira2Client
 import org.springframework.beans.factory.ObjectProvider
 
 class EmployeeServiceImplGetManagerTest {
-
     private val jira1Client = Mockito.mock(Jira1Client::class.java)
     private val adServiceProvider = Mockito.mock(ObjectProvider::class.java) as ObjectProvider<AdService>
     private val employeeService = EmployeeServiceImpl(

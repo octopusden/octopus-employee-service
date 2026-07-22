@@ -9,7 +9,9 @@ const val numberAttempts: Int = 5
 const val timeDelayAttempt: Int = 300
 const val numberIterations: Int = 5
 
-class OneCRetry(private val timeRetryInMillis: Int = 60000) : Retryer {
+class OneCRetry(
+    private val timeRetryInMillis: Int = 60000,
+) : Retryer {
     private val timeDelayIteration: Int = timeRetryInMillis / numberIterations - (numberAttempts * timeDelayAttempt)
     private val stopTime = System.currentTimeMillis() + timeRetryInMillis
 
@@ -38,7 +40,5 @@ class OneCRetry(private val timeRetryInMillis: Int = 60000) : Retryer {
         }
     }
 
-    override fun clone(): Retryer {
-        return OneCRetry(timeRetryInMillis)
-    }
+    override fun clone(): Retryer = OneCRetry(timeRetryInMillis)
 }

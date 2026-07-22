@@ -28,9 +28,7 @@ class EmployeeServiceImpl(
     private val jira2Client: Jira2Client,
     private val employeeServiceProperties: EmployeeServiceProperties,
     private val adService: ObjectProvider<AdService>,
-) :
-    EmployeeService {
-
+) : EmployeeService {
     override fun getEmployee(username: String): Employee {
         val user = try {
             jira1Client.getUser(username)
@@ -43,12 +41,14 @@ class EmployeeServiceImpl(
         return Employee(username, user.active)
     }
 
-    override fun getRequiredTime(username: String, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO {
-        return oneCService.getRequiredTime(getEmployee(username), fromDate, toDate)
-    }
+    override fun getRequiredTime(
+        username: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): RequiredTimeDTO = oneCService.getRequiredTime(getEmployee(username), fromDate, toDate)
 
-    override fun isUserAvailable(username: String): Boolean {
-        return jira2Client
+    override fun isUserAvailable(username: String): Boolean =
+        jira2Client
             .getAbsentUserNowIssues(formatJQL(employeeServiceProperties.userAvailability.jql, setOf(username)))
             .issues
             .isEmpty()
@@ -58,21 +58,23 @@ class EmployeeServiceImpl(
                 }
                 log.debug("isUserAvailable($username)=$available")
             }
-    }
 
     private fun checkUserExists(username: String) {
         getEmployee(username)
     }
 
     override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee {
-        val employeeAbsents = jira2Client.getAbsentUserNowIssues(formatJQL(employeeServiceProperties.userAvailability.jql, employees))
+        val employeeAbsents = jira2Client
+            .getAbsentUserNowIssues(formatJQL(employeeServiceProperties.userAvailability.jql, employees))
             .issues
             .map { issue -> issue.fields }
             .groupBy(
                 { fields -> fields.employee.name },
-                { fields -> UserAbsence(fields.employee, fields.from, fields.to) })
+                { fields -> UserAbsence(fields.employee, fields.from, fields.to) },
+            )
 
-        val availableEmployees = employees.filter { employee -> !employeeAbsents.containsKey(employee) }
+        val availableEmployees = employees
+            .filter { employee -> !employeeAbsents.containsKey(employee) }
             .map { employee -> getEmployee(employee) }
             .filter { employee -> employee.active }
 
@@ -83,10 +85,13 @@ class EmployeeServiceImpl(
                 ?.let { Employee(it.employee.name, it.employee.active) } ?: throw IllegalStateException()
     }
 
-    override fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO {
-        return oneCService.getWorkingDays(fromDate, toDate)
+    override fun getWorkingDays(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): WorkingDaysDTO =
+        oneCService
+            .getWorkingDays(fromDate, toDate)
             .also { workingDaysDTO -> log.debug("getWorkingDays($fromDate,$toDate)=$workingDaysDTO") }
-    }
 
     override fun getManager(username: String): ManagerDTO {
         log.debug("getManager({})", username)
@@ -97,7 +102,11 @@ class EmployeeServiceImpl(
         return ManagerDTO(svc.getManager(username))
     }
 
-    data class UserAbsence(val employee: JiraUser, val start: LocalDate, val end: LocalDate)
+    data class UserAbsence(
+        val employee: JiraUser,
+        val start: LocalDate,
+        val end: LocalDate,
+    )
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(EmployeeServiceImpl::class.java)

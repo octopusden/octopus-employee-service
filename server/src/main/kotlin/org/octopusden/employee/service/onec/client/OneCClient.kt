@@ -12,7 +12,7 @@ interface OneCClient {
     fun getPlannedTime(
         @Param("employee") employee: String,
         @Param("dateFrom", expander = LocalDateExpander::class) fromDate: LocalDate,
-        @Param("dateTo", expander = LocalDateExpander::class) toDate: LocalDate
+        @Param("dateTo", expander = LocalDateExpander::class) toDate: LocalDate,
     ): List<PlannedTimeDTO>
 
     @RequestLine("GET ru/hs/ow_http/ping")
@@ -21,6 +21,6 @@ interface OneCClient {
     @RequestLine("GET ru/hs/ow_http/getWorkingDays?dateFrom={dateFrom}&dateTo={dateTo}")
     fun getWorkingDays(
         @Param("dateFrom", expander = LocalDateExpander::class) fromDate: LocalDate,
-        @Param("dateTo", expander = LocalDateExpander::class) toDate: LocalDate
+        @Param("dateTo", expander = LocalDateExpander::class) toDate: LocalDate,
     ): WorkingDaysDTO
 }

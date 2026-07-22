@@ -8,9 +8,21 @@ import java.time.LocalDate
 
 interface EmployeeService {
     fun getEmployee(username: String): Employee
-    fun getRequiredTime(username: String, fromDate: LocalDate, toDate: LocalDate): RequiredTimeDTO
+
+    fun getRequiredTime(
+        username: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): RequiredTimeDTO
+
     fun isUserAvailable(username: String): Boolean
+
     fun getEmployeeAvailableEarlier(employees: Set<String>): Employee
-    fun getWorkingDays(fromDate: LocalDate, toDate: LocalDate): WorkingDaysDTO
+
+    fun getWorkingDays(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): WorkingDaysDTO
+
     fun getManager(username: String): ManagerDTO
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:Health.kt$org.octopusden.employee.client.common.dto.Health.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

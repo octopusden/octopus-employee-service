@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ClassOrdering:OneCRetry.kt$OneCRetry$Companion</ID>
+    <ID>NewLineAtEndOfFile:AbsenceIssueFieldsDTO.kt$org.octopusden.employee.service.jira.client.jira2.AbsenceIssueFieldsDTO.kt</ID>
+    <ID>NewLineAtEndOfFile:BaseIssueFieldsDTO.kt$org.octopusden.employee.service.jira.client.common.BaseIssueFieldsDTO.kt</ID>
+    <ID>NewLineAtEndOfFile:BaseJiraClient.kt$org.octopusden.employee.service.jira.client.common.BaseJiraClient.kt</ID>
+    <ID>NewLineAtEndOfFile:EmployeeServicePermissionEvaluator.kt$org.octopusden.employee.security.EmployeeServicePermissionEvaluator.kt</ID>
+    <ID>NewLineAtEndOfFile:OneCHealthIndicator.kt$org.octopusden.employee.actuator.OneCHealthIndicator.kt</ID>
+    <ID>NewLineAtEndOfFile:OpenApiConfig.kt$org.octopusden.employee.config.OpenApiConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:UserAvailableUtils.kt$org.octopusden.employee.service.UserAvailableUtils.kt</ID>
+    <ID>NewLineAtEndOfFile:UserAvailableUtilsTest.kt$org.octopusden.employee.service.UserAvailableUtilsTest.kt</ID>
+    <ID>SwallowedException:AdServiceImpl.kt$AdServiceImpl$e: InvalidNameException</ID>
+    <ID>SwallowedException:AdServiceImpl.kt$AdServiceImpl$e: NameNotFoundException</ID>
+    <ID>SwallowedException:EmployeeServiceImpl.kt$EmployeeServiceImpl$e: JiraClientException</ID>
+    <ID>ThrowingExceptionsWithoutMessageOrCause:EmployeeServiceImpl.kt$EmployeeServiceImpl$IllegalStateException()</ID>
+    <ID>TooGenericExceptionCaught:JiraErrorDecoder.kt$JiraErrorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:OneCHealthIndicator.kt$OneCHealthIndicator$e: Exception</ID>
+    <ID>TopLevelPropertyNaming:OneCRetry.kt$const val numberAttempts: Int = 5</ID>
+    <ID>TopLevelPropertyNaming:OneCRetry.kt$const val numberIterations: Int = 5</ID>
+    <ID>TopLevelPropertyNaming:OneCRetry.kt$const val timeDelayAttempt: Int = 300</ID>
+    <ID>UseCheckOrError:EmployeeServiceImpl.kt$EmployeeServiceImpl$throw IllegalStateException()</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -8,6 +8,25 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
     id("io.github.gradle-nexus.publish-plugin")
     signing
+    // Kotlin static-analysis tools — declared at root (apply false), applied per Kotlin subproject below.
+    id("io.gitlab.arturbosch.detekt") apply (false)
+    id("org.jlleitschuh.gradle.ktlint") apply (false)
+    // Octopus quality-gates convention plugin — configures detekt/ktlint and wires qualityStatic.
+    id("org.octopusden.octopus-quality")
+}
+
+octopusQuality {
+    // Repo has no coverage tool / no unit-test coverage target — disable coverage verification.
+    coverage {
+        enabled.set(false)
+    }
+    // Enforce the gate: detekt/ktlint violations fail the build. Current debt is absorbed by
+    // the committed detekt-baseline.xml / ktlint-baseline.xml files.
+    kotlin {
+        failOnViolation.set(true)
+    }
+    // Functional-test tasks are excluded from the quality gate.
+    excludeTasks("ft")
 }
 
 val defaultVersion = "${
@@ -40,6 +59,10 @@ subprojects {
     apply(plugin = "idea")
     apply(plugin = "java")
     apply(plugin = "signing")
+    // Kotlin static analysis — must be applied per subproject so the convention plugin's
+    // reactive configuration wires detekt/ktlintCheck tasks (avoids a hollow quality gate).
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     java {
         withJavadocJar()

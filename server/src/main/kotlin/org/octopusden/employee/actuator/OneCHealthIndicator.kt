@@ -10,15 +10,13 @@ import org.springframework.stereotype.Component
  */
 @Component
 class OneCHealthIndicator(
-    private val oneCClient: OneCClient
-): HealthIndicator {
-
-    override fun health(): Health {
-        return try {
+    private val oneCClient: OneCClient,
+) : HealthIndicator {
+    override fun health(): Health =
+        try {
             oneCClient.getHealth()
             Health.up().build()
         } catch (e: Exception) {
             Health.down(e).build()
         }
-    }
 }

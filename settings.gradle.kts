@@ -11,6 +11,10 @@ pluginManagement {
         id("org.springframework.boot") version springBootVersion
         id("io.github.gradle-nexus.publish-plugin") version ("1.1.0") apply (false)
         id("org.octopusden.octopus.oc-template") version (extra["octopus-oc-template.version"] as String)
+        // Octopus quality-gates convention plugin + Kotlin static-analysis tools.
+        id("io.gitlab.arturbosch.detekt") version (extra["detekt.version"] as String)
+        id("org.jlleitschuh.gradle.ktlint") version (extra["ktlint.version"] as String)
+        id("org.octopusden.octopus-quality") version (extra["octopus-quality.version"] as String)
     }
     repositories {
         gradlePluginPortal()

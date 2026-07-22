@@ -9,7 +9,9 @@ const val numberAttempts: Int = 5
 const val timeDelayAttempt: Int = 300
 const val numberIterations: Int = 5
 
-class EmployeeServiceRetry(private val timeRetryInMillis: Int = 60000) : Retryer {
+class EmployeeServiceRetry(
+    private val timeRetryInMillis: Int = 60000,
+) : Retryer {
     private val timeDelayIteration: Int = timeRetryInMillis / numberIterations - (numberAttempts * timeDelayAttempt)
     private val stopTime = System.currentTimeMillis() + timeRetryInMillis
 
@@ -41,7 +43,5 @@ class EmployeeServiceRetry(private val timeRetryInMillis: Int = 60000) : Retryer
         }
     }
 
-    override fun clone(): Retryer {
-        return EmployeeServiceRetry(timeRetryInMillis)
-    }
+    override fun clone(): Retryer = EmployeeServiceRetry(timeRetryInMillis)
 }

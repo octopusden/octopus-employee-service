@@ -15,14 +15,17 @@ class TestFtUtils private constructor() {
     companion object {
         private val hostApiGateway = System.getProperty("test.api-gateway-host")
             ?: throw Exception("System property 'test.api-gateway-host' must be defined")
-        private val apiUrl = "http://${hostApiGateway}/employee-service"
+        private val apiUrl = "http://$hostApiGateway/employee-service"
 
         @JvmStatic
         fun getSecuredClient(): EmployeeServiceClient =
             ClassicEmployeeServiceClient(object : EmployeeServiceClientParametersProvider {
                 override fun getBearerToken(): String? = null
+
                 override fun getApiUrl() = apiUrl
+
                 override fun getTimeRetryInMillis() = RETRY_IN_MILLIS
+
                 override fun getBasicCredentials(): String =
                     "${System.getProperty("employee-service.user")}:${System.getProperty("employee-service.password")}"
             })
@@ -31,18 +34,25 @@ class TestFtUtils private constructor() {
         fun getFakeTokenClient(): EmployeeServiceClient =
             ClassicEmployeeServiceClient(object : EmployeeServiceClientParametersProvider {
                 override fun getBearerToken(): String = FAKE_BEARER
+
                 override fun getApiUrl() = apiUrl
+
                 override fun getTimeRetryInMillis() = RETRY_IN_MILLIS
+
                 override fun getBasicCredentials(): String? = null
             })
 
         @JvmStatic
         fun getUnsecuredClient(): EmployeeServiceClient =
-            Feign.builder()
-                .decoder(JacksonDecoder(with(jacksonObjectMapper()) {
-                    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    this
-                }))
-                .target(EmployeeServiceClient::class.java, apiUrl)
+            Feign
+                .builder()
+                .decoder(
+                    JacksonDecoder(
+                        with(jacksonObjectMapper()) {
+                            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                            this
+                        },
+                    ),
+                ).target(EmployeeServiceClient::class.java, apiUrl)
     }
 }

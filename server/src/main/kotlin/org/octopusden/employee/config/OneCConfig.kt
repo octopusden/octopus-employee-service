@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit
 @EnableConfigurationProperties(OneCProperties::class)
 class OneCConfig(
     private val oneCProperties: OneCProperties,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
-
     @Bean
-    fun oneCClient(): OneCClient {
-        return Feign.builder()
+    fun oneCClient(): OneCClient =
+        Feign
+            .builder()
             .client(ApacheHttpClient())
             .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, true))
             .encoder(JacksonEncoder(objectMapper))
@@ -35,5 +35,4 @@ class OneCConfig(
             .logger(Slf4jLogger(OneCClient::class.java))
             .logLevel(Logger.Level.BASIC)
             .target(OneCClient::class.java, oneCProperties.host)
-    }
 }

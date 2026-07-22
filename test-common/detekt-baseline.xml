@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:BaseTest.kt$org.octopusden.employee.BaseTest.kt</ID>
+    <ID>TooManyFunctions:BaseEmployeeControllerTest.kt$BaseEmployeeControllerTest : BaseTest</ID>
+    <ID>UnusedPrivateMember:BaseEmployeeControllerTest.kt$BaseEmployeeControllerTest$private fun availableEmployees(): Stream&lt;Arguments&gt;</ID>
+    <ID>UnusedPrivateMember:BaseEmployeeControllerTest.kt$BaseEmployeeControllerTest$private fun existedEmployees(): Stream&lt;Arguments&gt;</ID>
+    <ID>UnusedPrivateMember:BaseEmployeeControllerTest.kt$BaseEmployeeControllerTest$private fun requiredTime(): Stream&lt;Arguments&gt;</ID>
+    <ID>UnusedPrivateMember:BaseEmployeesControllerTest.kt$BaseEmployeesControllerTest$private fun availableEarlier(): Stream&lt;Arguments&gt;</ID>
+  </CurrentIssues>
+</SmellBaseline>

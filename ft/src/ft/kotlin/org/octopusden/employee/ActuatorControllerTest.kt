@@ -6,7 +6,6 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ActuatorControllerTest {
-
     private val buildVersion: String = System.getProperty("buildVersion")
 
     @Test

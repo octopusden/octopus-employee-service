@@ -2,14 +2,15 @@ package org.octopusden.employee.client.common.dto
 
 import org.octopusden.employee.client.common.exception.NotFoundException
 
-
-enum class EmployeeServiceErrorCode(private val function: (message: String) -> Exception, val simpleMessage: String) {
+enum class EmployeeServiceErrorCode(
+    private val function: (message: String) -> Exception,
+    val simpleMessage: String,
+) {
     OTHER({ m -> IllegalStateException(m) }, "Internal server error"),
-    NOT_FOUND({ m -> NotFoundException(m) }, "Not Found");
+    NOT_FOUND({ m -> NotFoundException(m) }, "Not Found"),
+    ;
 
-    fun getException(message: String): Exception {
-        return function.invoke(message)
-    }
+    fun getException(message: String): Exception = function.invoke(message)
 
     companion object {
         fun getErrorCode(exception: Exception): EmployeeServiceErrorCode {

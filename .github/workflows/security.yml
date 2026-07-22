@@ -1,0 +1,17 @@
+# INTERNAL — runs on push to main, weekly, on manual dispatch, and as a workflow_call unit of the Merge Gate.
+name: Security
+
+on:
+  push:
+    branches: [ main ]
+  workflow_call:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'   # every Monday at 03:00 UTC
+
+jobs:
+  security:
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-security-reports.yml@v2.4.1
+    with:
+      java-version: '21'
+    secrets: inherit
