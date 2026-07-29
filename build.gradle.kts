@@ -144,3 +144,56 @@ subprojects {
 }
 
 tasks.findByName("publish")?.dependsOn(":employee-service:dockerPushImage")
+
+// Modules allowed to publish to Maven Central, by project PATH.
+// Paths, not names: the root project's path is ':' and two modules may share a simple name, so a
+// name-based check would be blind to a publication added to the root or to one of a name clash.
+// An allowlist, not a denylist: a newly added module defaults to unpublished, which is the safe
+// direction — starting to publish requires editing this list.
+val centralPublishedProjects = setOf(
+    ":client",
+    ":common",
+)
+
+fun centralPublicationPolicyProblems(): List<String> {
+    // Reading `publishing` throws on a project without maven-publish, so check the plugin first.
+    // allprojects, not subprojects: the root is a publishable project like any other.
+    val publishingProjects = allprojects.filter { candidate ->
+        candidate.plugins.hasPlugin("maven-publish") &&
+            candidate.extensions.getByType(PublishingExtension::class.java).publications.isNotEmpty()
+    }
+    val actual = publishingProjects.map { it.path }.toSet()
+    return if (actual != centralPublishedProjects) {
+        listOf(
+            "Maven Central publication set drifted.\n" +
+                "  allowlisted: ${centralPublishedProjects.sorted()}\n" +
+                "  publishing:  ${actual.sorted()}",
+        )
+    } else {
+        emptyList()
+    }
+}
+
+// A policy violation must fail its own gate, not every Gradle invocation: throwing at
+// configuration time would break build/test/dependencies and IDE sync as well.
+val verifyCentralPublicationPolicy =
+    tasks.register("verifyCentralPublicationPolicy") {
+        group = "verification"
+        description = "Fails if the set of modules publishing to Maven Central drifts from the allowlist."
+        doLast {
+            val problems = centralPublicationPolicyProblems()
+            if (problems.isNotEmpty()) {
+                throw GradleException(problems.joinToString("\n\n"))
+            }
+        }
+    }
+
+// publishToSonatype only exists with -Pnexus and `publish` is per-project, so match by name
+// instead of forcing either task into existence.
+gradle.projectsEvaluated {
+    allprojects {
+        tasks
+            .matching { it.name in setOf("publishToSonatype", "publish", "publishToMavenLocal") }
+            .configureEach { dependsOn(verifyCentralPublicationPolicy) }
+    }
+}

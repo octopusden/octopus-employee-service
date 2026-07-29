@@ -11,5 +11,8 @@ jobs:
     uses: octopusden/octopus-base/.github/workflows/common-check-and-register-release.yml@v2.4.1
     if:  "${{ github.event.workflow_run.conclusion == 'success' }}"
     with:
-      artifact-pattern: "octopus/employee/employee-service/_VER_/employee-service-_VER_.jar"
+      # Polls Maven Central for a released artifact of this repository before registering the
+      # release. The employee-service module no longer publishes to Central (docker image only),
+      # so the poll targets the client library, which is released at the same version.
+      artifact-pattern: "octopus/employee/client/_VER_/client-_VER_.jar"
     secrets: inherit
