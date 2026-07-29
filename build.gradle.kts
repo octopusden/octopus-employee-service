@@ -188,10 +188,17 @@ val verifyCentralPublicationPolicy =
         }
     }
 
-// publishToSonatype only exists with -Pnexus and `publish` is per-project, so match by name
-// instead of forcing either task into existence.
+// Hook the task TYPE first: every concrete publish task extends AbstractPublishToMaven, so
+// `publishMavenPublicationToSonatypeRepository` and friends are covered too. Matching only the
+// aggregates by name left the policy bypassable by invoking a leaf task directly — the release
+// path uses the aggregates, but a guard with a documented hole is not a policy boundary.
+// The aggregates are still matched by name because `publish` is per-project and
+// `publishToSonatype` only exists with -Pnexus, so neither can be forced into existence.
 gradle.projectsEvaluated {
     allprojects {
+        tasks.withType(AbstractPublishToMaven::class.java).configureEach {
+            dependsOn(verifyCentralPublicationPolicy)
+        }
         tasks
             .matching { it.name in setOf("publishToSonatype", "publish", "publishToMavenLocal") }
             .configureEach { dependsOn(verifyCentralPublicationPolicy) }
