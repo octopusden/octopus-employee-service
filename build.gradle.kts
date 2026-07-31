@@ -16,6 +16,18 @@ plugins {
 }
 
 octopusQuality {
+    // Regression guard on what reaches Maven Central, from octopus-base v2.7.0. This repository
+    // previously hand-rolled a task of the SAME name, deleted in this commit — two tasks with one
+    // name fail configuration, so the bump and the deletion cannot be separated.
+    publication {
+        enforceCentralPublications.set(true)
+        centralPublications.set(
+            setOf(
+                ":client|maven|org.octopusden.octopus.employee:client|[jar, jar:javadoc, jar:sources]",
+                ":common|maven|org.octopusden.octopus.employee:common|[jar, jar:javadoc, jar:sources]",
+            ),
+        )
+    }
     // Repo has no coverage tool / no unit-test coverage target — disable coverage verification.
     coverage {
         enabled.set(false)
@@ -144,63 +156,3 @@ subprojects {
 }
 
 tasks.findByName("publish")?.dependsOn(":employee-service:dockerPushImage")
-
-// Modules allowed to publish to Maven Central, by project PATH.
-// Paths, not names: the root project's path is ':' and two modules may share a simple name, so a
-// name-based check would be blind to a publication added to the root or to one of a name clash.
-// An allowlist, not a denylist: a newly added module defaults to unpublished, which is the safe
-// direction — starting to publish requires editing this list.
-val centralPublishedProjects = setOf(
-    ":client",
-    ":common",
-)
-
-fun centralPublicationPolicyProblems(): List<String> {
-    // Reading `publishing` throws on a project without maven-publish, so check the plugin first.
-    // allprojects, not subprojects: the root is a publishable project like any other.
-    val publishingProjects = allprojects.filter { candidate ->
-        candidate.plugins.hasPlugin("maven-publish") &&
-            candidate.extensions.getByType(PublishingExtension::class.java).publications.isNotEmpty()
-    }
-    val actual = publishingProjects.map { it.path }.toSet()
-    return if (actual != centralPublishedProjects) {
-        listOf(
-            "Maven Central publication set drifted.\n" +
-                "  allowlisted: ${centralPublishedProjects.sorted()}\n" +
-                "  publishing:  ${actual.sorted()}",
-        )
-    } else {
-        emptyList()
-    }
-}
-
-// A policy violation must fail its own gate, not every Gradle invocation: throwing at
-// configuration time would break build/test/dependencies and IDE sync as well.
-val verifyCentralPublicationPolicy =
-    tasks.register("verifyCentralPublicationPolicy") {
-        group = "verification"
-        description = "Fails if the set of modules publishing to Maven Central drifts from the allowlist."
-        doLast {
-            val problems = centralPublicationPolicyProblems()
-            if (problems.isNotEmpty()) {
-                throw GradleException(problems.joinToString("\n\n"))
-            }
-        }
-    }
-
-// Hook the task TYPE first: every concrete publish task extends AbstractPublishToMaven, so
-// `publishMavenPublicationToSonatypeRepository` and friends are covered too. Matching only the
-// aggregates by name left the policy bypassable by invoking a leaf task directly — the release
-// path uses the aggregates, but a guard with a documented hole is not a policy boundary.
-// The aggregates are still matched by name because `publish` is per-project and
-// `publishToSonatype` only exists with -Pnexus, so neither can be forced into existence.
-gradle.projectsEvaluated {
-    allprojects {
-        tasks.withType(AbstractPublishToMaven::class.java).configureEach {
-            dependsOn(verifyCentralPublicationPolicy)
-        }
-        tasks
-            .matching { it.name in setOf("publishToSonatype", "publish", "publishToMavenLocal") }
-            .configureEach { dependsOn(verifyCentralPublicationPolicy) }
-    }
-}
