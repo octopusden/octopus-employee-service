@@ -25,8 +25,9 @@ tasks.getByName<Jar>("jar") {
 
 // No Maven publication is declared here on purpose: this module's deliverable is the docker image
 // built from bootJar, and no project consumes it as a Maven dependency. The `maven-publish` plugin
-// stays applied so the `publish` lifecycle task keeps existing as a no-op. The published-module
-// allowlist in the root build (verifyCentralPublicationPolicy) guards this.
+// stays applied so the `publish` lifecycle task keeps existing as a no-op. The declared
+// `centralPublications` set in the root build's `octopusQuality { publication { } }` block (which
+// this module is absent from) guards this.
 
 tasks {
     val migrateMockData by registering(MigrateMockData::class)

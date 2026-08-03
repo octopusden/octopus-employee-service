@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-check-and-register-release.yml@v2.6.2
+    uses: octopusden/octopus-base/.github/workflows/common-check-and-register-release.yml@v2.7.0
     if:  "${{ github.event.workflow_run.conclusion == 'success' }}"
     with:
       # Polls Maven Central for a released artifact of this repository before registering the
