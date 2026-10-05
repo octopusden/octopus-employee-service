@@ -11,6 +11,7 @@ import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.client.common.exception.BadRequestException
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.config.EmployeeServiceProperties
+import org.octopusden.employee.config.EmployeeServiceProperties.UserAvailability
 import org.octopusden.employee.service.AdService
 import org.octopusden.employee.service.EmployeeService
 import org.octopusden.employee.service.OneCService
@@ -119,9 +120,10 @@ class EmployeeServiceImpl(
             throw BadRequestException("fromDate '$from' must not be after toDate '$to'")
         }
         employees.forEach { employee -> checkUserExists(employee) }
-        val usernames = employees.joinToString(",") { employee -> toJqlString(employee) }
-        val jql = "Employee in ($usernames) AND project in (\"Calendar RCIS\", \"Calendar\") " +
-            "AND \"Leave from date\" <= \"$to\" AND \"Leave to date\" >= \"$from\" AND status not in (Canceled, Rejected)"
+        // Reuse the configured "absent today" query: a leave overlaps the period if it starts by `to` and ends from `from`
+        val jql = formatJQL(employeeServiceProperties.userAvailability.jql, employees.map { employee -> toJqlString(employee) })
+            .replace(UserAvailability.START_OF_DAY, "\"$to\"")
+            .replace(UserAvailability.END_OF_DAY, "\"$from\"")
 
         // Expand each leave into calendar dates, clipped to the requested period
         val leaveDays = getAllAbsences(jql)
