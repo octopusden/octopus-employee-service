@@ -11,6 +11,7 @@ import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.ServerInfo
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
+import org.octopusden.employee.client.common.exception.BadRequestException
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.client.common.feign.LocalDateExpander
 import java.time.LocalDate
@@ -45,7 +46,7 @@ interface EmployeeServiceClient {
         @Param("employees") employees: Set<String>,
     ): Employee
 
-    @Throws(NotFoundException::class)
+    @Throws(NotFoundException::class, BadRequestException::class)
     @RequestLine(
         "GET employees/availability?employees={employees}&fromDate={fromDate}&toDate={toDate}",
         collectionFormat = CollectionFormat.CSV,

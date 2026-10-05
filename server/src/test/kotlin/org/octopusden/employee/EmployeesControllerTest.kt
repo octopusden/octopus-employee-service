@@ -2,12 +2,15 @@ package org.octopusden.employee
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeeServiceErrorCode
 import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
+import org.octopusden.employee.client.common.dto.ErrorResponse
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -72,6 +75,19 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
     fun getAvailabilityOfNotExistedEmployee() {
         performGetAvailability(setOf("nonexistent"), LocalDate.parse("2021-12-01"), LocalDate.parse("2021-12-31"))
             .andExpect(MockMvcResultMatchers.status().isNotFound)
+    }
+
+    @Test
+    fun getAvailabilityWithFromDateAfterToDate() {
+        val errorResponse = performGetAvailability(setOf("employee"), LocalDate.parse("2021-12-31"), LocalDate.parse("2021-12-01"))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
+            .andReturn()
+            .response
+            .toObject(object : TypeReference<ErrorResponse>() {})
+        Assertions.assertEquals(
+            ErrorResponse(EmployeeServiceErrorCode.BAD_REQUEST, "fromDate '2021-12-31' must not be after toDate '2021-12-01'"),
+            errorResponse,
+        )
     }
 
     private fun performGetAvailability(

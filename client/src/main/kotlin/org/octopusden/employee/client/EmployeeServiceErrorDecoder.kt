@@ -43,6 +43,7 @@ class EmployeeServiceErrorDecoder(
             errorResponse.errorCode.getException(errorResponse.errorMessage)
         }
         private val ERROR_RESPONSE_CODES: Map<Int, (ErrorResponse) -> Exception> = mapOf(
+            400 to errorResponseFunction,
             404 to errorResponseFunction,
             500 to errorResponseFunction,
         )

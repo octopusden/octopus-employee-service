@@ -7,3 +7,7 @@ abstract class EmployeeServiceException(
 class NotFoundException(
     message: String,
 ) : EmployeeServiceException(message)
+
+class BadRequestException(
+    message: String,
+) : EmployeeServiceException(message)

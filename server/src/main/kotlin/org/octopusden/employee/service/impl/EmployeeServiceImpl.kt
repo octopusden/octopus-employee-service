@@ -8,6 +8,7 @@ import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.UnavailableDayDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
+import org.octopusden.employee.client.common.exception.BadRequestException
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.config.EmployeeServiceProperties
 import org.octopusden.employee.service.AdService
@@ -112,6 +113,9 @@ class EmployeeServiceImpl(
     ): EmployeesAvailabilityDTO {
         val from = fromDate ?: LocalDate.now()
         val to = toDate ?: from.plusMonths(1)
+        if (from.isAfter(to)) {
+            throw BadRequestException("fromDate '$from' must not be after toDate '$to'")
+        }
         val jql = "Employee in (${employees.joinToString(",")}) AND project in (\"Calendar RCIS\", \"Calendar\") " +
             "AND \"Leave from date\" <= \"$to\" AND \"Leave to date\" >= \"$from\" AND status not in (Canceled, Rejected)"
 
