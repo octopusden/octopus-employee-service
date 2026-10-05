@@ -3,8 +3,7 @@ package org.octopusden.employee.client.common.dto
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class EmployeesAvailabilityDTO(
-    val from: String,
-    val to: String,
-    val employees: List<EmployeeAvailabilityDTO>,
+data class UnavailableDayDTO(
+    val date: String,
+    val reason: UnavailabilityReason,
 )
