@@ -20,6 +20,7 @@ import org.octopusden.employee.service.jira.client.common.JiraUser
 import org.octopusden.employee.service.jira.client.jira1.Jira1Client
 import org.octopusden.employee.service.jira.client.jira2.AbsenceIssueFieldsDTO
 import org.octopusden.employee.service.jira.client.jira2.Jira2Client
+import org.octopusden.employee.service.toJqlString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.ObjectProvider
@@ -118,7 +119,8 @@ class EmployeeServiceImpl(
             throw BadRequestException("fromDate '$from' must not be after toDate '$to'")
         }
         employees.forEach { employee -> checkUserExists(employee) }
-        val jql = "Employee in (${employees.joinToString(",")}) AND project in (\"Calendar RCIS\", \"Calendar\") " +
+        val usernames = employees.joinToString(",") { employee -> toJqlString(employee) }
+        val jql = "Employee in ($usernames) AND project in (\"Calendar RCIS\", \"Calendar\") " +
             "AND \"Leave from date\" <= \"$to\" AND \"Leave to date\" >= \"$from\" AND status not in (Canceled, Rejected)"
 
         // Expand each leave into calendar dates, clipped to the requested period
