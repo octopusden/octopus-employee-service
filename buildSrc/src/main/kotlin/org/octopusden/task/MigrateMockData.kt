@@ -109,8 +109,13 @@ abstract class MigrateMockData : DefaultTask() {
                 "jql" to jqlTemplate.format("unavailable")
             ) to "jira2/calendar-unavailable-response.json",
             "/jira2/rest/api/2/search" to mapOf(
-                "jql" to periodJqlTemplate.format("absent1,absent2,employee", "2021-12-31", "2021-12-01")
-            ) to "jira2/calendar-absent1-2-response.json",
+                "jql" to periodJqlTemplate.format("absent1,absent2,employee", "2021-12-31", "2021-12-01"),
+                "startAt" to "0"
+            ) to "jira2/calendar-absent1-2-page1-response.json",
+            "/jira2/rest/api/2/search" to mapOf(
+                "jql" to periodJqlTemplate.format("absent1,absent2,employee", "2021-12-31", "2021-12-01"),
+                "startAt" to "1"
+            ) to "jira2/calendar-absent1-2-page2-response.json",
             "/jira2/rest/api/2/search" to mapOf(
                 "jql" to periodJqlTemplate.format("absent1,absent2", "2021-12-31", "2021-12-14")
             ) to "jira2/calendar-absent1-2-response.json",

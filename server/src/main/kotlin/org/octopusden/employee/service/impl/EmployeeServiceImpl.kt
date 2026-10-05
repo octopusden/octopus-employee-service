@@ -18,6 +18,7 @@ import org.octopusden.employee.service.formatJQL
 import org.octopusden.employee.service.jira.client.common.JiraClientException
 import org.octopusden.employee.service.jira.client.common.JiraUser
 import org.octopusden.employee.service.jira.client.jira1.Jira1Client
+import org.octopusden.employee.service.jira.client.jira2.AbsenceIssueFieldsDTO
 import org.octopusden.employee.service.jira.client.jira2.Jira2Client
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -120,10 +121,7 @@ class EmployeeServiceImpl(
             "AND \"Leave from date\" <= \"$to\" AND \"Leave to date\" >= \"$from\" AND status not in (Canceled, Rejected)"
 
         // Expand each leave into calendar dates, clipped to the requested period
-        val leaveDays = jira2Client
-            .getAbsentUserNowIssues(jql)
-            .issues
-            .map { issue -> issue.fields }
+        val leaveDays = getAllAbsences(jql)
             .filter { fields -> !fields.from.isAfter(to) && !fields.to.isBefore(from) }
             .groupBy({ fields -> fields.employee.name }) { fields ->
                 fields.from
@@ -146,6 +144,15 @@ class EmployeeServiceImpl(
                 )
             },
         )
+    }
+
+    private fun getAllAbsences(jql: String): List<AbsenceIssueFieldsDTO> {
+        val absences = mutableListOf<AbsenceIssueFieldsDTO>()
+        do {
+            val page = jira2Client.getAbsentUserNowIssues(jql, absences.size)
+            absences += page.issues.map { issue -> issue.fields }
+        } while (page.issues.isNotEmpty() && absences.size < page.total)
+        return absences
     }
 
     data class UserAbsence(

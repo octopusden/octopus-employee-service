@@ -1,0 +1,21 @@
+{
+  "startAt": 0,
+  "maxResults": 1,
+  "total": 2,
+  "issues": [
+    {
+      "id": "324041",
+      "key": "CLDRRC-6521",
+      "fields": {
+        "customfield_16402": {
+          "name": "absent1",
+          "emailAddress": "absent1@domain.corp",
+          "displayName": "Absent Employee First",
+          "active": true
+        },
+        "customfield_10800": "2021-12-13",
+        "customfield_10801": "2021-12-17"
+      }
+    }
+  ]
+}

@@ -16,11 +16,12 @@ interface Jira2Client : BaseJiraClient {
         "GET /rest/api/2/search" +
             "?jql={jql}" +
             "&maxResults=$LIMIT" +
-            "&startAt=0" +
+            "&startAt={startAt}" +
             "&fields=$employeeFieldId,$fromDateFieldId,$toDateFieldId",
     )
     fun getAbsentUserNowIssues(
         @Param("jql") jql: String,
+        @Param("startAt") startAt: Int = 0,
     ): JiraIssuesDTO<AbsenceIssueFieldsDTO>
 
     @RequestLine("GET rest/scriptrunner/latest/custom/localInstancesDataForRnd")
