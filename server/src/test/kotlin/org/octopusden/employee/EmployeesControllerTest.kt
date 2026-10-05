@@ -3,9 +3,11 @@ package org.octopusden.employee
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -16,8 +18,10 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.time.LocalDate
 import java.util.Locale
 
 @AutoConfigureMockMvc
@@ -52,6 +56,37 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
             .andReturn()
             .response
             .toObject(object : TypeReference<Employee>() {})
+
+    override fun getAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): EmployeesAvailabilityDTO =
+        performGetAvailability(employees, fromDate, toDate)
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn()
+            .response
+            .toObject(object : TypeReference<EmployeesAvailabilityDTO>() {})
+
+    @Test
+    fun getAvailabilityOfNotExistedEmployee() {
+        performGetAvailability(setOf("nonexistent"), LocalDate.parse("2021-12-01"), LocalDate.parse("2021-12-31"))
+            .andExpect(MockMvcResultMatchers.status().isNotFound)
+    }
+
+    private fun performGetAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+    ): ResultActions =
+        mvc.perform(
+            MockMvcRequestBuilders
+                .get("/employees/availability")
+                .param("employees", *employees.toTypedArray())
+                .param("fromDate", fromDate.format(isoLocalDateFormatter))
+                .param("toDate", toDate.format(isoLocalDateFormatter))
+                .accept(MediaType.APPLICATION_JSON),
+        )
 
     override fun getWorkingDays(
         fromDate: String,

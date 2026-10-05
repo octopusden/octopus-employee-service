@@ -60,6 +60,7 @@ abstract class MigrateMockData : DefaultTask() {
 
     companion object {
         private const val jqlTemplate = "Employee in (%s) AND project in (\"Calendar RCIS\", \"Calendar\") AND \"Leave from date\" <= startOfDay() AND \"Leave to date\" >= endOfDay() AND status not in (Canceled, Rejected)"
+        private const val periodJqlTemplate = "Employee in (%s) AND project in (\"Calendar RCIS\", \"Calendar\") AND \"Leave from date\" <= \"%s\" AND \"Leave to date\" >= \"%s\" AND status not in (Canceled, Rejected)"
         private val endpointToResponseFileName = mapOf(
             "/one-c/ru/hs/ow_http/ping" to emptyMap<String, String>() to "one-c-health.json",
             "/one-c/ru/hs/ow_http/getPlannedTime" to mapOf(
@@ -107,6 +108,15 @@ abstract class MigrateMockData : DefaultTask() {
             "/jira2/rest/api/2/search" to mapOf(
                 "jql" to jqlTemplate.format("unavailable")
             ) to "jira2/calendar-unavailable-response.json",
+            "/jira2/rest/api/2/search" to mapOf(
+                "jql" to periodJqlTemplate.format("absent1,absent2,employee", "2021-12-31", "2021-12-01")
+            ) to "jira2/calendar-absent1-2-response.json",
+            "/jira2/rest/api/2/search" to mapOf(
+                "jql" to periodJqlTemplate.format("absent1,absent2", "2021-12-31", "2021-12-14")
+            ) to "jira2/calendar-absent1-2-response.json",
+            "/jira2/rest/api/2/search" to mapOf(
+                "jql" to periodJqlTemplate.format("nonexistent", "2021-12-31", "2021-12-01")
+            ) to "jira2/calendar-employee-response.json",
             "/jira2/rest/scriptrunner/latest/custom/localInstancesDataForRnd" to mapOf<String, String>(
             ) to "jira2/customers.json"
         )
