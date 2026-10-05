@@ -16,6 +16,7 @@ import org.octopusden.employee.client.EmployeeServiceErrorDecoder
 import org.octopusden.employee.client.EmployeeServiceRetry
 import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.Health
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
@@ -26,6 +27,7 @@ import java.time.LocalDate
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 
+@Suppress("TooManyFunctions") // one function per EmployeeServiceClient endpoint
 class ClassicEmployeeServiceClient(
     parametersProvider: EmployeeServiceClientParametersProvider,
     private val mapper: ObjectMapper,
@@ -54,6 +56,12 @@ class ClassicEmployeeServiceClient(
     override fun getEmployee(employee: String): Employee = client.getEmployee(employee)
 
     override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee = client.getEmployeeAvailableEarlier(employees)
+
+    override fun getAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate?,
+        toDate: LocalDate?,
+    ): EmployeesAvailabilityDTO = client.getAvailability(employees, fromDate, toDate)
 
     override fun getCustomers(): Set<CustomerDTO> = client.getCustomers()
 

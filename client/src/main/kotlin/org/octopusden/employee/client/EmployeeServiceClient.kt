@@ -5,6 +5,7 @@ import feign.Param
 import feign.RequestLine
 import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.Health
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
@@ -43,6 +44,17 @@ interface EmployeeServiceClient {
     fun getEmployeeAvailableEarlier(
         @Param("employees") employees: Set<String>,
     ): Employee
+
+    @Throws(NotFoundException::class)
+    @RequestLine(
+        "GET employees/availability?employees={employees}&fromDate={fromDate}&toDate={toDate}",
+        collectionFormat = CollectionFormat.CSV,
+    )
+    fun getAvailability(
+        @Param("employees") employees: Set<String>,
+        @Param("fromDate", expander = LocalDateExpander::class) fromDate: LocalDate? = null,
+        @Param("toDate", expander = LocalDateExpander::class) toDate: LocalDate? = null,
+    ): EmployeesAvailabilityDTO
 
     @RequestLine("GET customers")
     fun getCustomers(): Set<CustomerDTO>
