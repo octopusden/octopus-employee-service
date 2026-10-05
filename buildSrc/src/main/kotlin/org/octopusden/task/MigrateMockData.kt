@@ -96,6 +96,12 @@ abstract class MigrateMockData : DefaultTask() {
             "/jira1/rest/api/2/user" to mapOf(
                 "username" to "inactive",
             ) to "jira1/jira-inactive.json",
+            "/jira1/rest/api/2/user" to mapOf(
+                "username" to "absent1",
+            ) to "jira1/jira-employee.json",
+            "/jira1/rest/api/2/user" to mapOf(
+                "username" to "absent2",
+            ) to "jira1/jira-employee.json",
             "/jira2/rest/api/2/search" to mapOf(
                 "jql" to jqlTemplate.format("absent1,absent2,employee")
             ) to "jira2/calendar-absent1-2-response.json",
@@ -119,9 +125,6 @@ abstract class MigrateMockData : DefaultTask() {
             "/jira2/rest/api/2/search" to mapOf(
                 "jql" to periodJqlTemplate.format("absent1,absent2", "2021-12-31", "2021-12-14")
             ) to "jira2/calendar-absent1-2-response.json",
-            "/jira2/rest/api/2/search" to mapOf(
-                "jql" to periodJqlTemplate.format("nonexistent", "2021-12-31", "2021-12-01")
-            ) to "jira2/calendar-employee-response.json",
             "/jira2/rest/scriptrunner/latest/custom/localInstancesDataForRnd" to mapOf<String, String>(
             ) to "jira2/customers.json"
         )

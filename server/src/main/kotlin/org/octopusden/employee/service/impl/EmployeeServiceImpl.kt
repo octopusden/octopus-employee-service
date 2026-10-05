@@ -117,6 +117,7 @@ class EmployeeServiceImpl(
         if (from.isAfter(to)) {
             throw BadRequestException("fromDate '$from' must not be after toDate '$to'")
         }
+        employees.forEach { employee -> checkUserExists(employee) }
         val jql = "Employee in (${employees.joinToString(",")}) AND project in (\"Calendar RCIS\", \"Calendar\") " +
             "AND \"Leave from date\" <= \"$to\" AND \"Leave to date\" >= \"$from\" AND status not in (Canceled, Rejected)"
 
@@ -129,10 +130,6 @@ class EmployeeServiceImpl(
                     .datesUntil(fields.to.coerceAtMost(to).plusDays(1))
                     .toList()
             }.mapValues { (_, dates) -> dates.flatten().toSortedSet() }
-
-        employees
-            .filterNot { employee -> leaveDays.containsKey(employee) }
-            .forEach { employee -> checkUserExists(employee) }
 
         return EmployeesAvailabilityDTO(
             from.toString(),
