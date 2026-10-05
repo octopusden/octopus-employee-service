@@ -6,7 +6,6 @@ import org.octopusden.employee.client.common.dto.EmployeeAvailabilityDTO
 import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
-import org.octopusden.employee.client.common.dto.UnavailabilityReason
 import org.octopusden.employee.client.common.dto.UnavailableDayDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.client.common.exception.NotFoundException
@@ -139,7 +138,7 @@ class EmployeeServiceImpl(
             employees.map { employee ->
                 EmployeeAvailabilityDTO(
                     employee,
-                    leaveDays[employee].orEmpty().map { date -> UnavailableDayDTO(date.toString(), UnavailabilityReason.LEAVE) },
+                    leaveDays[employee].orEmpty().map { date -> UnavailableDayDTO(date.toString(), UnavailableDayDTO.REASON_LEAVE) },
                 )
             },
         )

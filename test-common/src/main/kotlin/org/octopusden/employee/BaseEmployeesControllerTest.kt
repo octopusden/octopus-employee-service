@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.octopusden.employee.client.common.dto.Employee
 import org.octopusden.employee.client.common.dto.EmployeeAvailabilityDTO
 import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
-import org.octopusden.employee.client.common.dto.UnavailabilityReason
 import org.octopusden.employee.client.common.dto.UnavailableDayDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import java.time.LocalDate
@@ -82,7 +81,7 @@ abstract class BaseEmployeesControllerTest : BaseTest() {
         ) = from
             .toLocalDate()
             .datesUntil(to.toLocalDate().plusDays(1))
-            .map { date -> UnavailableDayDTO(date.toString(), UnavailabilityReason.LEAVE) }
+            .map { date -> UnavailableDayDTO(date.toString(), UnavailableDayDTO.REASON_LEAVE) }
             .toList()
         return Stream.of(
             Arguments.of(
