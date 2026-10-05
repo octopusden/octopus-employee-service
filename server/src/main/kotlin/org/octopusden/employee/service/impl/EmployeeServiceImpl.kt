@@ -2,8 +2,12 @@ package org.octopusden.employee.service.impl
 
 import org.apache.http.HttpStatus
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeeAvailabilityDTO
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
+import org.octopusden.employee.client.common.dto.UnavailabilityReason
+import org.octopusden.employee.client.common.dto.UnavailableDayDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.config.EmployeeServiceProperties
@@ -100,6 +104,45 @@ class EmployeeServiceImpl(
             return ManagerDTO(null)
         }
         return ManagerDTO(svc.getManager(username))
+    }
+
+    override fun getAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate?,
+        toDate: LocalDate?,
+    ): EmployeesAvailabilityDTO {
+        val from = fromDate ?: LocalDate.now()
+        val to = toDate ?: from.plusMonths(1)
+        val jql = "Employee in (${employees.joinToString(",")}) AND project in (\"Calendar RCIS\", \"Calendar\") " +
+            "AND \"Leave from date\" <= \"$to\" AND \"Leave to date\" >= \"$from\" AND status not in (Canceled, Rejected)"
+
+        // Expand each leave into calendar dates, clipped to the requested period
+        val leaveDays = jira2Client
+            .getAbsentUserNowIssues(jql)
+            .issues
+            .map { issue -> issue.fields }
+            .filter { fields -> !fields.from.isAfter(to) && !fields.to.isBefore(from) }
+            .groupBy({ fields -> fields.employee.name }) { fields ->
+                fields.from
+                    .coerceAtLeast(from)
+                    .datesUntil(fields.to.coerceAtMost(to).plusDays(1))
+                    .toList()
+            }.mapValues { (_, dates) -> dates.flatten().toSortedSet() }
+
+        employees
+            .filterNot { employee -> leaveDays.containsKey(employee) }
+            .forEach { employee -> checkUserExists(employee) }
+
+        return EmployeesAvailabilityDTO(
+            from.toString(),
+            to.toString(),
+            employees.map { employee ->
+                EmployeeAvailabilityDTO(
+                    employee,
+                    leaveDays[employee].orEmpty().map { date -> UnavailableDayDTO(date.toString(), UnavailabilityReason.LEAVE) },
+                )
+            },
+        )
     }
 
     data class UserAbsence(

@@ -1,6 +1,7 @@
 package org.octopusden.employee.service
 
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
@@ -25,4 +26,10 @@ interface EmployeeService {
     ): WorkingDaysDTO
 
     fun getManager(username: String): ManagerDTO
+
+    fun getAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate?,
+        toDate: LocalDate?,
+    ): EmployeesAvailabilityDTO
 }
