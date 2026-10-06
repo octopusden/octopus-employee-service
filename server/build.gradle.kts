@@ -10,7 +10,7 @@ plugins {
     id("org.octopusden.octopus.oc-template")
     id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
     `maven-publish`
-    id("com.avast.gradle.docker-compose") version "0.16.9"
+    id("com.avast.gradle.docker-compose")
 }
 
 repositories {
@@ -52,6 +52,8 @@ tasks.getByName("dockerPushImage") {
 dockerCompose {
     useComposeFiles.add("$projectDir/docker/docker-compose.yml")
     waitForTcpPorts = true
+    // The standalone docker-compose binary, as plugin 0.16 used; 0.17 defaults to `docker compose`.
+    useDockerComposeV2 = false
     captureContainersOutputToFiles = layout.buildDirectory
         .dir("docker-logs")
         .get()
@@ -156,4 +158,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":test-common"))
+    // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
