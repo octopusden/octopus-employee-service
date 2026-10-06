@@ -3,7 +3,7 @@ import org.octopusden.task.MigrateMockData
 
 plugins {
     id("org.octopusden.octopus.oc-template")
-    id("com.avast.gradle.docker-compose") version "0.16.9"
+    id("com.avast.gradle.docker-compose")
 }
 
 fun String.getPort() =
@@ -21,6 +21,8 @@ fun String.getExt() = project.ext[this] as String
 dockerCompose {
     useComposeFiles.add("${projectDir}${File.separator}docker${File.separator}docker-compose.yml")
     waitForTcpPorts = true
+    // The standalone docker-compose binary, as plugin 0.16 used; 0.17 defaults to `docker compose`.
+    useDockerComposeV2 = false
     captureContainersOutputToFiles = layout.buildDirectory
         .file("docker-logs")
         .get()
@@ -58,8 +60,6 @@ sourceSets {
 val ftImplementation: Configuration by configurations.getting {
     extendsFrom(configurations.implementation.get())
 }
-
-ftImplementation.isCanBeResolved = true
 
 configurations["ftRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
@@ -180,7 +180,8 @@ val ft by tasks.creating(Test::class) {
 }
 
 idea.module {
-    scopes["PROVIDED"]?.get("plus")?.add(configurations["ftImplementation"])
+    // The resolvable view of ftImplementation: a declare-only configuration cannot be resolved.
+    scopes["PROVIDED"]?.get("plus")?.add(configurations["ftCompileClasspath"])
 }
 
 dependencies {
@@ -196,4 +197,6 @@ dependencies {
     ftImplementation("ch.qos.logback:logback-core:1.4.1")
     ftImplementation("ch.qos.logback:logback-classic:1.4.1")
     ftImplementation("org.slf4j:slf4j-api:1.7.30")
+    // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
+    "ftRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 }

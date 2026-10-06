@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.net.InetAddress
 import java.util.zip.CRC32
 
@@ -88,6 +89,15 @@ subprojects {
 
     kotlin {
         compilerOptions.jvmTarget = JvmTarget.JVM_21
+        // The Kotlin Gradle plugin (kotlin-plugin.version) is newer than the Kotlin runtime these
+        // modules ship with and run on (kotlin.version). Hold the compiler to the runtime's level so
+        // the bytecode and metadata stay what consumers of the published modules can read, and no
+        // call can reach a stdlib API newer than the stdlib on the classpath.
+        compilerOptions.languageVersion = KotlinVersion.KOTLIN_1_9
+        compilerOptions.apiVersion = KotlinVersion.KOTLIN_1_9
+        // Version the plugin gives kotlin-stdlib / kotlin-reflect and its own constraints on them;
+        // it defaults to the plugin's version, which would leak into the published POMs/modules.
+        coreLibrariesVersion = providers.gradleProperty("kotlin.version").get()
     }
 
     repositories {

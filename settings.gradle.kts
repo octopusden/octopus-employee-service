@@ -1,16 +1,17 @@
 pluginManagement {
     plugins {
-        val kotlinVersion = extra["kotlin.version"] as String
-        val springBootVersion = extra["spring-boot.version"] as String
+        val kotlinPluginVersion = extra["kotlin-plugin.version"] as String
+        val springBootPluginVersion = extra["spring-boot-plugin.version"] as String
 
-        id("org.jetbrains.kotlin.jvm") version kotlinVersion
-        id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
-        id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-        id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
-        id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
-        id("org.springframework.boot") version springBootVersion
-        id("io.github.gradle-nexus.publish-plugin") version ("1.1.0") apply (false)
+        id("org.jetbrains.kotlin.jvm") version kotlinPluginVersion
+        id("org.jetbrains.kotlin.plugin.spring") version kotlinPluginVersion
+        id("org.jetbrains.kotlin.plugin.jpa") version kotlinPluginVersion
+        id("org.jetbrains.kotlin.plugin.allopen") version kotlinPluginVersion
+        id("org.jetbrains.kotlin.plugin.noarg") version kotlinPluginVersion
+        id("org.springframework.boot") version springBootPluginVersion
+        id("io.github.gradle-nexus.publish-plugin") version ("2.0.0") apply (false)
         id("org.octopusden.octopus.oc-template") version (extra["octopus-oc-template.version"] as String)
+        id("com.avast.gradle.docker-compose") version (extra["docker-compose-plugin.version"] as String)
         // Octopus quality-gates convention plugin + Kotlin static-analysis tools.
         id("io.gitlab.arturbosch.detekt") version (extra["detekt.version"] as String)
         id("org.jlleitschuh.gradle.ktlint") version (extra["ktlint.version"] as String)
