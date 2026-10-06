@@ -135,12 +135,12 @@ class EmployeeServiceImpl(
             }.mapValues { (_, dates) -> dates.flatten().toSortedSet() }
 
         return EmployeesAvailabilityDTO(
-            from.toString(),
-            to.toString(),
+            from,
+            to,
             employees.map { employee ->
                 EmployeeAvailabilityDTO(
                     employee,
-                    leaveDays[employee].orEmpty().map { date -> UnavailableDayDTO(date.toString(), UnavailableDayDTO.REASON_LEAVE) },
+                    leaveDays[employee].orEmpty().map { date -> UnavailableDayDTO(date, UnavailableDayDTO.REASON_LEAVE) },
                 )
             },
         )

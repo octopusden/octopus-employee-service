@@ -81,7 +81,7 @@ abstract class BaseEmployeesControllerTest : BaseTest() {
         ) = from
             .toLocalDate()
             .datesUntil(to.toLocalDate().plusDays(1))
-            .map { date -> UnavailableDayDTO(date.toString(), UnavailableDayDTO.REASON_LEAVE) }
+            .map { date -> UnavailableDayDTO(date, UnavailableDayDTO.REASON_LEAVE) }
             .toList()
         return Stream.of(
             Arguments.of(
@@ -89,8 +89,8 @@ abstract class BaseEmployeesControllerTest : BaseTest() {
                 "2021-12-01",
                 "2021-12-31",
                 EmployeesAvailabilityDTO(
-                    "2021-12-01",
-                    "2021-12-31",
+                    "2021-12-01".toLocalDate(),
+                    "2021-12-31".toLocalDate(),
                     listOf(
                         EmployeeAvailabilityDTO("absent1", leave("2021-12-13", "2021-12-17")),
                         EmployeeAvailabilityDTO("absent2", leave("2021-12-10", "2021-12-15")),
@@ -104,8 +104,8 @@ abstract class BaseEmployeesControllerTest : BaseTest() {
                 "2021-12-14",
                 "2021-12-31",
                 EmployeesAvailabilityDTO(
-                    "2021-12-14",
-                    "2021-12-31",
+                    "2021-12-14".toLocalDate(),
+                    "2021-12-31".toLocalDate(),
                     listOf(
                         EmployeeAvailabilityDTO("absent1", leave("2021-12-14", "2021-12-17")),
                         EmployeeAvailabilityDTO("absent2", leave("2021-12-14", "2021-12-15")),

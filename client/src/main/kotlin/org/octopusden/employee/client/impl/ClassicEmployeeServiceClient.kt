@@ -2,6 +2,7 @@ package org.octopusden.employee.client.impl
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import feign.Feign
 import feign.Logger
@@ -27,6 +28,10 @@ import java.time.LocalDate
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 
+/**
+ * A custom [ObjectMapper] passed to the constructor must have `JavaTimeModule` registered, because responses
+ * contain `LocalDate` fields. The default mapper already does.
+ */
 @Suppress("TooManyFunctions") // one function per EmployeeServiceClient endpoint
 class ClassicEmployeeServiceClient(
     parametersProvider: EmployeeServiceClientParametersProvider,
@@ -84,6 +89,7 @@ class ClassicEmployeeServiceClient(
         private fun getMapper(): ObjectMapper {
             val objectMapper = jacksonObjectMapper()
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            objectMapper.registerModule(JavaTimeModule())
             return objectMapper
         }
 

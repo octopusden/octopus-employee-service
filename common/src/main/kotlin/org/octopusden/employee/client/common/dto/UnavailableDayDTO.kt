@@ -1,6 +1,7 @@
 package org.octopusden.employee.client.common.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.time.LocalDate
 
 /**
  * [reason] is a plain string so that clients keep working when the server adds new reasons.
@@ -8,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class UnavailableDayDTO(
-    val date: String,
+    val date: LocalDate,
     val reason: String,
 ) {
     companion object {
