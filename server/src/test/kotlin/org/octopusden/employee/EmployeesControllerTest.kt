@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.octopusden.employee.client.common.dto.Employee
 import org.octopusden.employee.client.common.dto.EmployeeServiceErrorCode
 import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
@@ -26,6 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.LocalDate
 import java.util.Locale
+import java.util.stream.Stream
 
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension::class)
@@ -77,18 +81,30 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
             .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 
-    @Test
-    fun getAvailabilityWithFromDateAfterToDate() {
-        val errorResponse = performGetAvailability(setOf("employee"), LocalDate.parse("2021-12-31"), LocalDate.parse("2021-12-01"))
+    @ParameterizedTest
+    @MethodSource("invalidAvailabilityRequests")
+    fun getAvailabilityWithInvalidRequest(
+        employees: Set<String>,
+        fromDate: String,
+        toDate: String,
+        expectedMessage: String,
+    ) {
+        val errorResponse = performGetAvailability(employees, LocalDate.parse(fromDate), LocalDate.parse(toDate))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
             .andReturn()
             .response
             .toObject(object : TypeReference<ErrorResponse>() {})
-        Assertions.assertEquals(
-            ErrorResponse(EmployeeServiceErrorCode.BAD_REQUEST, "fromDate '2021-12-31' must not be after toDate '2021-12-01'"),
-            errorResponse,
-        )
+        Assertions.assertEquals(ErrorResponse(EmployeeServiceErrorCode.BAD_REQUEST, expectedMessage), errorResponse)
     }
+
+    @Suppress("UnusedPrivateMember") // used by @MethodSource
+    private fun invalidAvailabilityRequests(): Stream<Arguments> =
+        Stream.of(
+            Arguments.of(setOf("employee"), "2021-12-31", "2021-12-01", "fromDate '2021-12-31' must not be after toDate '2021-12-01'"),
+            // 2021-01-01..2021-04-01 is 91 days
+            Arguments.of(setOf("employee"), "2021-01-01", "2021-04-01", "Period must not exceed 90 days (fromDate and toDate included)"),
+            Arguments.of((1..16).map { "employee$it" }.toSet(), "2021-12-01", "2021-12-31", "Number of employees must be between 1 and 15"),
+        )
 
     private fun performGetAvailability(
         employees: Set<String>,

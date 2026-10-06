@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Service
 class EmployeeServiceImpl(
@@ -116,9 +117,7 @@ class EmployeeServiceImpl(
     ): EmployeesAvailabilityDTO {
         val from = fromDate ?: LocalDate.now()
         val to = toDate ?: from.plusMonths(1)
-        if (from.isAfter(to)) {
-            throw BadRequestException("fromDate '$from' must not be after toDate '$to'")
-        }
+        validateAvailabilityRequest(employees, from, to)
         employees.forEach { employee -> checkUserExists(employee) }
         // Reuse the configured "absent today" query: a leave overlaps the period if it starts by `to` and ends from `from`
         val jql = formatJQL(employeeServiceProperties.userAvailability.jql, employees.map { employee -> toJqlString(employee) })
@@ -147,6 +146,22 @@ class EmployeeServiceImpl(
         )
     }
 
+    private fun validateAvailabilityRequest(
+        employees: Set<String>,
+        from: LocalDate,
+        to: LocalDate,
+    ) {
+        val error = when {
+            employees.isEmpty() || employees.size > MAX_AVAILABILITY_EMPLOYEES ->
+                "Number of employees must be between 1 and $MAX_AVAILABILITY_EMPLOYEES"
+            from.isAfter(to) -> "fromDate '$from' must not be after toDate '$to'"
+            ChronoUnit.DAYS.between(from, to) + 1 > MAX_AVAILABILITY_DAYS ->
+                "Period must not exceed $MAX_AVAILABILITY_DAYS days (fromDate and toDate included)"
+            else -> null
+        }
+        error?.let { throw BadRequestException(it) }
+    }
+
     private fun getAllAbsences(jql: String): List<AbsenceIssueFieldsDTO> {
         val absences = mutableListOf<AbsenceIssueFieldsDTO>()
         do {
@@ -164,5 +179,7 @@ class EmployeeServiceImpl(
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(EmployeeServiceImpl::class.java)
+        private const val MAX_AVAILABILITY_EMPLOYEES = 15
+        private const val MAX_AVAILABILITY_DAYS = 90
     }
 }
