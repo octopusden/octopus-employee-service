@@ -104,6 +104,11 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
             // 2021-01-01..2021-04-01 is 91 days
             Arguments.of(setOf("employee"), "2021-01-01", "2021-04-01", "Period must not exceed 90 days (fromDate and toDate included)"),
             Arguments.of((1..16).map { "employee$it" }.toSet(), "2021-12-01", "2021-12-31", "Number of employees must be between 1 and 15"),
+            // no employees parameter at all
+            Arguments.of(emptySet<String>(), "2021-12-01", "2021-12-31", "Number of employees must be between 1 and 15"),
+            // ?employees=
+            Arguments.of(setOf(""), "2021-12-01", "2021-12-31", "Number of employees must be between 1 and 15"),
+            Arguments.of(setOf("employee", " "), "2021-12-01", "2021-12-31", "Employee usernames must not be blank"),
         )
 
     private fun performGetAvailability(
@@ -114,7 +119,7 @@ class EmployeesControllerTest : BaseEmployeesControllerTest() {
         mvc.perform(
             MockMvcRequestBuilders
                 .get("/employees/availability")
-                .param("employees", *employees.toTypedArray())
+                .apply { if (employees.isNotEmpty()) param("employees", *employees.toTypedArray()) }
                 .param("fromDate", fromDate.format(isoLocalDateFormatter))
                 .param("toDate", toDate.format(isoLocalDateFormatter))
                 .accept(MediaType.APPLICATION_JSON),

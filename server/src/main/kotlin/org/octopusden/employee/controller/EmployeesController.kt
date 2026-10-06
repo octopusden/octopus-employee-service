@@ -25,10 +25,11 @@ class EmployeesController(
     @GetMapping("availability")
     @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")
     fun getAvailability(
-        @RequestParam employees: Set<String>,
+        // Optional here so that a missing list is rejected by the service validation (400), not as an internal error
+        @RequestParam("employees", required = false) employees: Set<String>?,
         @RequestParam("fromDate", required = false) fromDate: LocalDate?,
         @RequestParam("toDate", required = false) toDate: LocalDate?,
-    ): EmployeesAvailabilityDTO = employeeService.getAvailability(employees, fromDate, toDate)
+    ): EmployeesAvailabilityDTO = employeeService.getAvailability(employees.orEmpty(), fromDate, toDate)
 
     @GetMapping("working-days")
     @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")

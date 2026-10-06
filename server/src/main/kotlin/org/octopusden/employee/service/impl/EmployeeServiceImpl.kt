@@ -154,6 +154,7 @@ class EmployeeServiceImpl(
         val error = when {
             employees.isEmpty() || employees.size > MAX_AVAILABILITY_EMPLOYEES ->
                 "Number of employees must be between 1 and $MAX_AVAILABILITY_EMPLOYEES"
+            employees.any { employee -> employee.isBlank() } -> "Employee usernames must not be blank"
             from.isAfter(to) -> "fromDate '$from' must not be after toDate '$to'"
             ChronoUnit.DAYS.between(from, to) + 1 > MAX_AVAILABILITY_DAYS ->
                 "Period must not exceed $MAX_AVAILABILITY_DAYS days (fromDate and toDate included)"
