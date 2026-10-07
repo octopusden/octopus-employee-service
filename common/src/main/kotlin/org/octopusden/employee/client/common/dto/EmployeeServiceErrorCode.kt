@@ -1,5 +1,6 @@
 package org.octopusden.employee.client.common.dto
 
+import org.octopusden.employee.client.common.exception.BadRequestException
 import org.octopusden.employee.client.common.exception.NotFoundException
 
 enum class EmployeeServiceErrorCode(
@@ -8,6 +9,7 @@ enum class EmployeeServiceErrorCode(
 ) {
     OTHER({ m -> IllegalStateException(m) }, "Internal server error"),
     NOT_FOUND({ m -> NotFoundException(m) }, "Not Found"),
+    BAD_REQUEST({ m -> BadRequestException(m) }, "Bad Request"),
     ;
 
     fun getException(message: String): Exception = function.invoke(message)

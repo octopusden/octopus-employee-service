@@ -62,4 +62,5 @@ dependencies {
     api(project(":common"))
     api("com.fasterxml.jackson.module:jackson-module-kotlin:${project.properties["jackson.version"]}")
     api("com.fasterxml.jackson.core:jackson-databind:${project.properties["jackson.version"]}")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${project.properties["jackson.version"]}")
 }

@@ -1,6 +1,7 @@
 package org.octopusden.employee.controller
 
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
 import org.octopusden.employee.service.EmployeeService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -20,6 +21,15 @@ class EmployeesController(
     fun getEmployeeAvailableEarlier(
         @RequestParam employees: Set<String>,
     ): Employee = employeeService.getEmployeeAvailableEarlier(employees)
+
+    @GetMapping("availability")
+    @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")
+    fun getAvailability(
+        // Optional here so that a missing list is rejected by the service validation (400), not as an internal error
+        @RequestParam("employees", required = false) employees: Set<String>?,
+        @RequestParam("fromDate", required = false) fromDate: LocalDate?,
+        @RequestParam("toDate", required = false) toDate: LocalDate?,
+    ): EmployeesAvailabilityDTO = employeeService.getAvailability(employees.orEmpty(), fromDate, toDate)
 
     @GetMapping("working-days")
     @PreAuthorize("@employeeServicePermissionEvaluator.hasPermission('ACCESS_EMPLOYEE')")

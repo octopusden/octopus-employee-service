@@ -2,6 +2,7 @@ package org.octopusden.employee.controller
 
 import org.octopusden.employee.client.common.dto.EmployeeServiceErrorCode
 import org.octopusden.employee.client.common.dto.ErrorResponse
+import org.octopusden.employee.client.common.exception.BadRequestException
 import org.octopusden.employee.client.common.exception.EmployeeServiceException
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.slf4j.Logger
@@ -20,6 +21,11 @@ class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun handleNotFound(exception: EmployeeServiceException) = getErrorResponse(exception)
+
+    @ExceptionHandler(BadRequestException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    fun handleBadRequest(exception: EmployeeServiceException) = getErrorResponse(exception)
 
     @ExceptionHandler(AccessDeniedException::class)
     @ResponseStatus(HttpStatus.FORBIDDEN)

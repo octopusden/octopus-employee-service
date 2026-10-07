@@ -2,6 +2,7 @@ package org.octopusden.employee.client.impl
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import feign.Feign
 import feign.Logger
@@ -16,6 +17,7 @@ import org.octopusden.employee.client.EmployeeServiceErrorDecoder
 import org.octopusden.employee.client.EmployeeServiceRetry
 import org.octopusden.employee.client.common.dto.CustomerDTO
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.Health
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
@@ -26,6 +28,11 @@ import java.time.LocalDate
 import java.util.Base64
 import java.util.concurrent.TimeUnit
 
+/**
+ * A custom [ObjectMapper] passed to the constructor must have `JavaTimeModule` registered, because responses
+ * contain `LocalDate` fields. The default mapper already does.
+ */
+@Suppress("TooManyFunctions") // one function per EmployeeServiceClient endpoint
 class ClassicEmployeeServiceClient(
     parametersProvider: EmployeeServiceClientParametersProvider,
     private val mapper: ObjectMapper,
@@ -55,6 +62,12 @@ class ClassicEmployeeServiceClient(
 
     override fun getEmployeeAvailableEarlier(employees: Set<String>): Employee = client.getEmployeeAvailableEarlier(employees)
 
+    override fun getAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate?,
+        toDate: LocalDate?,
+    ): EmployeesAvailabilityDTO = client.getAvailability(employees, fromDate, toDate)
+
     override fun getCustomers(): Set<CustomerDTO> = client.getCustomers()
 
     override fun getWorkingDays(
@@ -76,6 +89,7 @@ class ClassicEmployeeServiceClient(
         private fun getMapper(): ObjectMapper {
             val objectMapper = jacksonObjectMapper()
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            objectMapper.registerModule(JavaTimeModule())
             return objectMapper
         }
 

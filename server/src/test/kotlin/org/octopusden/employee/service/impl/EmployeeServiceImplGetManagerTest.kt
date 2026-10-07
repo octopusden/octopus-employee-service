@@ -21,7 +21,10 @@ class EmployeeServiceImplGetManagerTest {
         Mockito.mock(OneCService::class.java),
         jira1Client,
         Mockito.mock(Jira2Client::class.java),
-        EmployeeServiceProperties(8, EmployeeServiceProperties.UserAvailability("")),
+        EmployeeServiceProperties(
+            8,
+            EmployeeServiceProperties.UserAvailability("\"Leave from date\" <= startOfDay() AND \"Leave to date\" >= endOfDay()"),
+        ),
         adServiceProvider,
     )
 

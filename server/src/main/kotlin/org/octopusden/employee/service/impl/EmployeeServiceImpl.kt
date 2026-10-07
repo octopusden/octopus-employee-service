@@ -2,11 +2,16 @@ package org.octopusden.employee.service.impl
 
 import org.apache.http.HttpStatus
 import org.octopusden.employee.client.common.dto.Employee
+import org.octopusden.employee.client.common.dto.EmployeeAvailabilityDTO
+import org.octopusden.employee.client.common.dto.EmployeesAvailabilityDTO
 import org.octopusden.employee.client.common.dto.ManagerDTO
 import org.octopusden.employee.client.common.dto.RequiredTimeDTO
+import org.octopusden.employee.client.common.dto.UnavailableDayDTO
 import org.octopusden.employee.client.common.dto.WorkingDaysDTO
+import org.octopusden.employee.client.common.exception.BadRequestException
 import org.octopusden.employee.client.common.exception.NotFoundException
 import org.octopusden.employee.config.EmployeeServiceProperties
+import org.octopusden.employee.config.EmployeeServiceProperties.UserAvailability
 import org.octopusden.employee.service.AdService
 import org.octopusden.employee.service.EmployeeService
 import org.octopusden.employee.service.OneCService
@@ -14,12 +19,15 @@ import org.octopusden.employee.service.formatJQL
 import org.octopusden.employee.service.jira.client.common.JiraClientException
 import org.octopusden.employee.service.jira.client.common.JiraUser
 import org.octopusden.employee.service.jira.client.jira1.Jira1Client
+import org.octopusden.employee.service.jira.client.jira2.AbsenceIssueFieldsDTO
 import org.octopusden.employee.service.jira.client.jira2.Jira2Client
+import org.octopusden.employee.service.toJqlString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Service
 class EmployeeServiceImpl(
@@ -102,6 +110,68 @@ class EmployeeServiceImpl(
         return ManagerDTO(svc.getManager(username))
     }
 
+    override fun getAvailability(
+        employees: Set<String>,
+        fromDate: LocalDate?,
+        toDate: LocalDate?,
+    ): EmployeesAvailabilityDTO {
+        val from = fromDate ?: LocalDate.now()
+        val to = toDate ?: from.plusMonths(1)
+        validateAvailabilityRequest(employees, from, to)
+        employees.forEach { employee -> checkUserExists(employee) }
+        // Reuse the configured "absent today" query: a leave overlaps the period if it starts by `to` and ends from `from`
+        val jql = formatJQL(employeeServiceProperties.userAvailability.jql, employees.map { employee -> toJqlString(employee) })
+            .replace(UserAvailability.START_OF_DAY, "\"$to\"")
+            .replace(UserAvailability.END_OF_DAY, "\"$from\"")
+
+        // Expand each leave into calendar dates, clipped to the requested period
+        val leaveDays = getAllAbsences(jql)
+            .filter { fields -> !fields.from.isAfter(to) && !fields.to.isBefore(from) }
+            .groupBy({ fields -> fields.employee.name }) { fields ->
+                fields.from
+                    .coerceAtLeast(from)
+                    .datesUntil(fields.to.coerceAtMost(to).plusDays(1))
+                    .toList()
+            }.mapValues { (_, dates) -> dates.flatten().toSortedSet() }
+
+        return EmployeesAvailabilityDTO(
+            from,
+            to,
+            employees.map { employee ->
+                EmployeeAvailabilityDTO(
+                    employee,
+                    leaveDays[employee].orEmpty().map { date -> UnavailableDayDTO(date, UnavailableDayDTO.REASON_LEAVE) },
+                )
+            },
+        )
+    }
+
+    private fun validateAvailabilityRequest(
+        employees: Set<String>,
+        from: LocalDate,
+        to: LocalDate,
+    ) {
+        val error = when {
+            employees.isEmpty() || employees.size > MAX_AVAILABILITY_EMPLOYEES ->
+                "Number of employees must be between 1 and $MAX_AVAILABILITY_EMPLOYEES"
+            employees.any { employee -> employee.isBlank() } -> "Employee usernames must not be blank"
+            from.isAfter(to) -> "fromDate '$from' must not be after toDate '$to'"
+            ChronoUnit.DAYS.between(from, to) + 1 > MAX_AVAILABILITY_DAYS ->
+                "Period must not exceed $MAX_AVAILABILITY_DAYS days (fromDate and toDate included)"
+            else -> null
+        }
+        error?.let { throw BadRequestException(it) }
+    }
+
+    private fun getAllAbsences(jql: String): List<AbsenceIssueFieldsDTO> {
+        val absences = mutableListOf<AbsenceIssueFieldsDTO>()
+        do {
+            val page = jira2Client.getAbsentUserNowIssues(jql, absences.size)
+            absences += page.issues.map { issue -> issue.fields }
+        } while (page.issues.isNotEmpty() && absences.size < page.total)
+        return absences
+    }
+
     data class UserAbsence(
         val employee: JiraUser,
         val start: LocalDate,
@@ -110,5 +180,7 @@ class EmployeeServiceImpl(
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(EmployeeServiceImpl::class.java)
+        private const val MAX_AVAILABILITY_EMPLOYEES = 15
+        private const val MAX_AVAILABILITY_DAYS = 90
     }
 }
